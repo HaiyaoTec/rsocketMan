@@ -1,0 +1,26 @@
+{
+  "name": "rsocketman-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sudongyuer",
+  "license": "ISC",
+  "dependencies": {
+    "rsocket-core": "0.0.27",
+    "rsocket-flowable": "0.0.27",
+    "rsocket-websocket-server": "0.0.27"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.11",
+    "@types/rsocket-core": "0.0.7",
+    "@types/rsocket-types": "0.0.3",
+    "@types/rsocket-websocket-server": "0.0.3",
+    "close-with-grace": "^1.1.0",
+    "typescript": "^4.5.2",
+    "winston": "^3.3.3"
+  }
+}
