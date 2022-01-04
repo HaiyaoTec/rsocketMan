@@ -1,3 +1,5 @@
+const {buffer} = require('buffer').Buffer
+
 const {RSocketServer, TEXT_PLAIN, CompositeMetadata, BufferEncoders, JsonSerializers} = require('rsocket-core');
 const RSocketWebSocketServer = require('rsocket-websocket-server');
 const {Single, Flowable} = require('rsocket-flowable');
@@ -11,7 +13,7 @@ const port = 10081;
 
 const transportOpts = {
   host: host,
-  port: port,
+  port: port
 };
 
 //维护连接的状态
@@ -21,7 +23,7 @@ const statuses = {
 };
 
 //需要webSocket底层协议
-const transport = new WebSocketTransport(transportOpts);
+const transport = new WebSocketTransport(transportOpts, BufferEncoders);
 
 function getRequestHandler(requestingRSocket, setupPayload) {
 
@@ -76,13 +78,13 @@ function getRequestHandler(requestingRSocket, setupPayload) {
         console.log(`requestResponse response`, msg);
         try {
           subscriber.onComplete({
-            data:JSON.stringify(msg),
-            metadata: '123', // or new Buffer(...)
+            data: Buffer.from(msg),
+            metadata: Buffer.from('123'), // or new Buffer(...)
           });
         } catch (e) {
           subscriber.onError(e);
         }
-      }, 100);
+      }, 3000);
 
 
     });
@@ -98,21 +100,31 @@ function getRequestHandler(requestingRSocket, setupPayload) {
     // });
   }
 
-  // function handleRequestStream(payload: { data: string; }) {
-  //   console.log(payload)
-  //   return new Flowable((subscriber) => {
-  //     console.log(payload.data + '-----from client handleRequestStream')
-  //     subscriber.onSubscribe({
-  //       cancel() {
-  //       },
-  //       request(num) {
-  //         console.log(num)
-  //       }
-  //     });
-  //     subscriber.onNext({data: '231231231231', metadata: '123123'})
-  //     subscriber.onComplete()
-  //   })
-  // }
+  function handleRequestStream(payload: { data: string; }) {
+    console.log(payload)
+    return new Flowable((subscriber) => {
+      console.log(payload.data + '-----from client handleRequestStream')
+      subscriber.onSubscribe({
+        cancel() {
+        },
+        request(num) {
+          console.log(num);
+          for (let i = 0; i < num; i++) {
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                subscriber.onNext({
+                  data: Buffer.from(JSON.stringify({data: 'data ' + i})),
+                  metadata: Buffer.from('123123')
+                })
+              }, i * 1000)
+            }).then(() => {
+              subscriber.onComplete()
+            })
+          }
+        }
+      });
+    })
+  }
 
   // return new Flowable((subscriber) => {
   //   console.log(payload.data + '-----from client handleRequestStream')
@@ -129,25 +141,30 @@ function getRequestHandler(requestingRSocket, setupPayload) {
   //   subscriber.onComplete()
   // });
 
-  // function handleRequestChannel(payload) {
-  //   return new Flowable((subscriber) => {
-  //     console.log(JSON.stringify(payload) + '-----from client handleRequestChannel')
-  //     subscriber.onSubscribe({
-  //       cancel() {
-  //       }, request(num) {
-  //         console.log(num)
-  //       }
-  //     })
-  //
-  //     subscriber.onNext({
-  //       data: 'from server handleRequestChannel1'
-  //     })
-  //     subscriber.onNext({
-  //       data: 'from server handleRequestChannel2'
-  //     })
-  //     subscriber.onComplete()
-  //   });
-  // }
+  function handleRequestChannel(payload) {
+    return new Flowable((subscriber) => {
+      console.log(JSON.stringify(payload) + '-----from client handleRequestChannel')
+      subscriber.onSubscribe({
+        cancel() {
+        },
+        request(num) {
+          console.log(num);
+          for (let i = 0; i < num; i++) {
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                subscriber.onNext({
+                  data: Buffer.from('from server handleRequestChannel ' + i),
+                  metadata: Buffer.from('123123')
+                })
+              }, i * 1000)
+            }).then(() => {
+              // subscriber.onComplete()
+            })
+          }
+        }
+      })
+    });
+  }
 
   // function handleMetadataPush(payload) {
   //   return new Single((subscriber) => {
@@ -159,8 +176,8 @@ function getRequestHandler(requestingRSocket, setupPayload) {
   return {
     fireAndForget: handleFireAndForget,
     requestResponse: handleRequestResponse,
-    // requestStream: handleRequestStream,
-    // requestChannel: handleRequestChannel,
+    requestStream: handleRequestStream,
+    requestChannel: handleRequestChannel,
     // metadataPush: handleMetadataPush
   };
 }
@@ -168,7 +185,7 @@ function getRequestHandler(requestingRSocket, setupPayload) {
 
 const rSocketServer = new RSocketServer({
   transport,
-  getRequestHandler
+  getRequestHandler,
 });
 
 

@@ -1,12 +1,10 @@
 import {configureStore, combineReducers} from '@reduxjs/toolkit'
 import connectionReducer from './slice/ConnectionSlice'
-import dataDisplayReducer from './slice/DataDisplaySlice'
-import fireAndForgetReducer from './slice/FireAndForgetSlice'
+import requestSliceReducer from './slice/RequestSlice'
 
 const rootReducer = combineReducers({
   connection: connectionReducer,
-  dataDisplayReducer: dataDisplayReducer,
-  fireAndForgetReducer:fireAndForgetReducer
+  requestSliceReducer: requestSliceReducer
 })
 
 

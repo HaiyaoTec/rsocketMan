@@ -1,16 +1,23 @@
 /** @jsxImportSource @emotion/react */
-import {css, jsx} from '@emotion/react'
-import React, {FC, useState} from "react";
-import {Form, Input, Button, Radio, Select} from 'antd';
+import {css, jsx} from "@emotion/react";
+import React, {FC, useEffect, useRef, useState} from "react";
+import {Form, Input, Button, Radio, Select, message} from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import {useDispatch, useSelector} from "react-redux";
 import {configure} from "../../store/slice/ConnectionSlice";
 import {fireAndForget, sendMessageByMethod, transformData} from "../../utils";
-import {nanoid} from 'nanoid'
+import {nanoid} from "nanoid";
+import {Routes, Route, useParams} from "react-router-dom";
+import {store} from "../../store/store";
+import {updateRequestItem} from "../../store/slice/RequestSlice";
+import './css/index.css'
+import prettier from 'prettier'
+//@ts-ignore
+import parserBabel from "prettier/esm/parser-babel.mjs";
 
 
-type LayoutType = Parameters<typeof Form>[0]['layout'];
-const {Option} = Select
+type LayoutType = Parameters<typeof Form>[0]["layout"];
+const {Option} = Select;
 
 const formItemLayout = {
   labelCol: {
@@ -22,97 +29,358 @@ const formItemLayout = {
     sm: {span: 14},
   },
 };
+// window.location.reload();
 
 const DataDisplay: FC = () => {
-  const {metadataMimeType, dataMimeType} = useSelector((state) => state.connection)
+  console.log("render");
+  const params = useParams();
+  const {metadataMimeType, dataMimeType} = useSelector(
+    (state) => state.connection
+  );
+  const [dataItem, setDataItem] = useState(null);
+  const id = params.requestID;
+  // const dataDisplayData = useSelector((state) => state.dataDisplayReducer)
+  //                         useSelector((state)=>state.requestSliceReducer)
+  let currentRequest = useSelector((state) =>
+    state.requestSliceReducer.find((item) => {
+      return item.id === params.requestID;
+    })
+  );
 
-  const dataDisplayData = useSelector((state) => state.dataDisplayReducer)
-  console.log(dataDisplayData)
-  const initialValues = {
-    method: dataDisplayData.method,
-    route: dataDisplayData.route,
-    metadata: dataDisplayData.metadata,
-    data: dataDisplayData.data
-  }
-  let id = useSelector((state) => state.dataDisplayReducer.id)
+  const receiveItems = currentRequest?.receive;
+
+  useEffect(() => {
+    console.log(id);
+    form.setFieldsValue(initialValues);
+    setDataItem(null)
+  }, [currentRequest?.method, currentRequest?.id]);
+
+  let initialValues = {
+    method: currentRequest?.method,
+    route: currentRequest?.route,
+    metadata: currentRequest?.metadata,
+    data: currentRequest?.data,
+  };
+
+  console.log(initialValues);
   //没有id则表示为Add Request添加的
-  if (!id) {
-    id = nanoid()
-  }
-  console.log(id)
+  // if (!id) {
+  //   id = nanoid()
+  // }
+  console.log(currentRequest);
+
   const onFinish = (value: any) => {
-    console.log(metadataMimeType, dataMimeType)
-    const method = value.method
+    console.log(metadataMimeType, dataMimeType);
     //绑定id
-    value.id = id
-    sendMessageByMethod(value)
+    // value.id = id
+    //更新RequestItem
+    //切换了请求方法
+    if (value.method !== currentRequest?.method) {
+      store.dispatch(updateRequestItem({...value, id, receive: []}));
+    } else {
+      store.dispatch(updateRequestItem({...value, id}));
+    }
+    sendMessageByMethod({...value, id});
+    message.success('message send ')
+  };
+
+  const formatData = (data: string) => {
+    try {
+      return prettier.format(data, {
+        parser: "babel",
+        plugins: [parserBabel],
+      })
+    } catch (e) {
+      return data
+    }
   }
 
   const [form] = Form.useForm();
-
+  // form.setFieldsValue(initialValues)
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
   return (
-    <>
-      <div css={css`display: flex;
-        height: 100%`}>
-        {/*  left*/}
-        <div css={css`display: flex;
-          flex-direction: column;
-          min-width: 600px`}>
-          {/*  leftTop*/}
-          <div css={css`background-color: green;
-            flex: 1;
+    // !dataDisplayData.show?
+    //   <div>123</div>:
+    <div key={currentRequest?.id}>
+      {currentRequest && (
+        <div
+          css={css`
             display: flex;
-            flex-direction: column;
-            justify-content: center`}>
-            <Form
-              {...formItemLayout}
-              layout={'horizontal'}
-              form={form}
-              onFinish={onFinish}
-              initialValues={initialValues}
+            height: 100%;
+          `}
+        >
+          {/*  left*/}
+          <div
+            css={css`
+              display: flex;
+              flex-direction: column;
+              min-width: 700px;
+              width: 50%;
+            `}
+          >
+            {/*  leftTop*/}
+            <div
+              css={css`
+                flex: 1;
+                border: 1px solid #000000;
+                border-top: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                background-color: #262b30;
+              `}
             >
-              <Form.Item
-                name="method"
-                label="method"
-                hasFeedback
-                rules={[{required: true, message: 'Please select your method!'}]}
+              <Form
+                {...formItemLayout}
+                layout={"horizontal"}
+                form={form}
+                onFinish={onFinish}
               >
-                <Select placeholder="Please select method">
-                  <Option value="fireAndForget">fireAndForget</Option>
-                  <Option value="requestResponse">requestResponse</Option>
-                  <Option value="requestStream">requestStream</Option>
-                  <Option value="text/plain">requestChannel</Option>
-                </Select>
-              </Form.Item>
-              <Form.Item name={"route"} required={false} label="route">
-                <Input placeholder="eg: xxx/xxx"/>
-              </Form.Item>
-              <Form.Item name={"metadata"} label="metadata">
-                <TextArea/>
-              </Form.Item>
-              <Form.Item name={"data"} label="data">
-                <TextArea/>
-              </Form.Item>
-              <Form.Item label={"button"}>
-                <Button type="primary" htmlType="submit" css={css`background-color: #4c78f7;`}>
-                  Send
-                </Button>
-              </Form.Item>
-            </Form>
+                <Form.Item
+                  name="method"
+                  label="Method"
+                  css={css`font-weight: bold;`}
+                  hasFeedback
+                  rules={[
+                    {required: true, message: "Please select your method!"},
+                  ]}
+                >
+                  <Select placeholder="Please select method">
+                    <Option value="fireAndForget">fireAndForget</Option>
+                    <Option value="requestResponse">requestResponse</Option>
+                    <Option value="requestStream">requestStream</Option>
+                    <Option value="requestChannel">requestChannel</Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item name={"route"} required={false} label="Route" css={css`font-weight: bold;`}>
+                  <Input placeholder="eg: xxx/xxx"/>
+                </Form.Item>
+                <Form.Item name={"metadata"} label="Metadata" css={css`font-weight: bold;`}>
+                  <TextArea/>
+                </Form.Item>
+                <Form.Item name={"data"} label="Data" css={css`font-weight: bold;`}>
+                  <TextArea/>
+                </Form.Item>
+                <Form.Item label={"Submit"} css={css`font-weight: bold;`}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    css={css`
+                      width: 100px;
+                      font-weight: bold;
+                      background-color: #4ac2dd;
+                    `}
+                  >
+                    Send
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
+            {/*  leftBottom*/}
+            <div
+              css={css`
+                background-color: #252b30;
+                border: 1px solid #000000;
+                border-top: 0;
+                flex: 1;
+              `}
+            >
+              <h2 css={
+                css`
+                  margin-left: 30px;
+                  font-weight: bold;
+                  color: #ffffff;
+                `}>Receive</h2>
+              <div css={css`display: flex;
+                flex-direction: column;
+                align-items: center`}>
+                {/*@ts-ignore*/}
+                {receiveItems?.map((item, index) => {
+                  return (
+                    <div
+                      key={index}
+                      css={css`
+                        width: 600px;
+                        background-color: #31383e;
+                        margin-bottom: 15px;
 
+                        &:hover {
+                          background-color: #1b1e21
+                        }
+
+                        border: 2px solid #ccc;
+                      `}
+                    >
+                      {/*  item top*/}
+                      <div
+                        css={css`
+                          display: flex;
+                          justify-content: space-between;
+                          padding: 10px 16px;
+                        `}
+                      >
+                        <span>
+                          <span
+                            css={css`
+                              margin-right: 6px;
+                              font-weight: bold;
+                              color: #ffffff;
+                            `}
+                          >
+                            #{receiveItems.length - index}
+                          </span>
+                          {/*消息是正确还是错误的*/}
+                          {
+                            item?.success?
+                              <span
+                                css={css`
+                              color: #71cf40;
+                              font-weight: bold;
+                            `}
+                              >
+                            OK
+                          </span>
+                              :
+                            <span
+                            css={css`
+                              color: red;
+                              font-weight: bold;
+                            `}
+                            >
+                            Error
+                            </span>
+                          }
+
+                        </span>
+                        <span css={css`font-weight: bold;
+                          color: #ffffff`}>{item.date}</span>
+                      </div>
+                      {/*  item bottom*/}
+                      <div
+                        css={css`
+                          display: flex;
+                          justify-content: space-between;
+                          padding: 16px;
+                          font-weight: bold;
+                          align-items: center;
+                        `}
+                      >
+                        <span
+                          css={css`
+                            width: 70%;
+                            overflow: hidden;
+                            color: #ffffff;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                          `}
+                        >
+                          {JSON.stringify({
+                            data: item?.data,
+                            metadata: item?.metadata,
+                          })}
+                        </span>
+                        <span
+                          css={css`
+                            display: inline-block;
+                            background-color: #45c0dc;
+                            padding: 3px;
+                            border-radius: 6px;
+                            color: #ffffff;
+                            font-weight: bold;
+                            cursor: pointer;
+                            font-size: 16px;
+                          `}
+                          onClick={() => {
+                            // @ts-ignore
+                            setDataItem(item);
+                          }}
+                        >
+                          View All
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          {/*  leftBottom*/}
-          <div css={css`background-color: blue;
-            flex: 1`}>leftBottom
-          </div>
+          {/*  right*/}
+          {dataItem && (
+            <div
+              css={css`
+                background-color: #272b30;
+                flex: 1;
+                padding: 16px;
+                min-width: 500px;
+              `}
+            >
+              <div css={css`position: sticky;
+                top: 0`}>
+                {/*data*/}
+                <div
+                  css={css`
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #ffffff;
+                  `}
+                >
+                  Data
+                </div>
+                <pre
+                  css={css`
+                    width: 100%;
+                    min-height: 300px;
+                    max-height: 500px;
+                    border: 1px solid #bbbbbb;
+                    background-color: #31383e;
+                    color: #ffffff;
+                    word-break: break-all;
+                    white-space: break-spaces;
+                    font-weight: bold;
+                  `}
+                >
+                  {/*TODO */}
+                  {
+                    //@ts-ignore
+                    formatData(dataItem?.data)
+                  }
+
+                </pre>
+                <br/>
+                {/*metadata*/}
+                <div
+                  css={css`
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #ffffff;
+                  `}
+                >
+                  Metadata
+                </div>
+                <div
+                  css={css`
+                    width: 100%;
+                    height: 200px;
+                    border: 1px solid #bbbbbb;
+                    background-color: #31383e;
+                    color: #ffffff;
+                    word-break: break-all;
+                    font-weight: bold;
+                  `}
+                >
+                  {/*@ts-ignore*/}
+                  {dataItem?.metadata}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        {/*  right*/}
-        <div css={css`background-color: aqua;
-          flex: 1`}>right
-        </div>
-      </div>
-    </>
+      )}
+    </div>
   );
-}
+};
 
-export default DataDisplay
+export default DataDisplay;

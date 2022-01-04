@@ -1,9 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import {css, jsx} from '@emotion/react'
-import {Modal, Button} from 'antd';
+import {Modal} from 'antd';
 import React, {FC, useState} from "react";
 import FormData from "../FormData/FormData";
-
+import './css/index.css'
 const Configure: FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(true);
   const showModal = () => {

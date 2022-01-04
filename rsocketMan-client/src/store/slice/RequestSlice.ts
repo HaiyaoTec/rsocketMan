@@ -1,31 +1,43 @@
-// import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit'
-// import {createRSocketClient} from "../../utils";
-//
-// export interface RequestSliceItem {
-//   id: string
-//   method: string
-//   route?: string
-//   metadata?: any
-//   data?: any
-//   receive: any[]
-// }
-//
-//
-//
-// const initialState:Array<RequestSliceItem>= []
-//
-//
-// export const  = createSlice({
-//   name: 'dataDisplay',
-//   initialState,
-//   reducers: {
-//     updateDataDisplay: (state, action: PayloadAction<DataDisplay>) => {
-//       return {...state, ...action.payload}
-//     }
-//   },
-// })
-//
-// // Action creators are generated for each case reducer function
-// export const {updateDataDisplay} = dataDisplaySlice.actions
-//
-// export default dataDisplaySlice.reducer
+import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit'
+
+export type receiveItem={
+  metadata?:any
+  data?:any
+  date?:string
+  success?:boolean
+}
+export interface RequestSliceItem {
+  id: string
+  method: string
+  route?: string
+  metadata?: any
+  data?: any
+  receive?: receiveItem[]
+}
+
+const initialState: Array<RequestSliceItem> = []
+
+export const requestSlice = createSlice({
+  name: 'requestSlice',
+  initialState,
+  reducers: {
+    addRequestItem: (state, action: PayloadAction<RequestSliceItem>) => {
+      state.unshift(action.payload)
+      return state
+    },
+    updateRequestItem: (state, action: PayloadAction<RequestSliceItem>) => {
+      state = state.map((item) => {
+        if (item.id === action.payload.id) {
+          return {...item, ...action.payload}
+        }
+        return item
+      })
+      return state
+    }
+  },
+})
+
+// Action creators are generated for each case reducer function
+export const {addRequestItem, updateRequestItem} = requestSlice.actions
+
+export default requestSlice.reducer

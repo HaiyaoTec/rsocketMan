@@ -1,11 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import {css, jsx} from '@emotion/react'
-import React, {FC, useState} from "react";
-import {Form, Input, Button, Radio, Select, message} from 'antd';
+import React, {FC, useRef, useState} from "react";
+import {Form, Input, Button, Radio, Select, message, Switch, Checkbox} from 'antd';
 import {FormInstance} from "antd/es";
 import {useDispatch, useSelector} from 'react-redux'
 import {configure, updateRScoketInstance} from "../../store/slice/ConnectionSlice";
-import {createRSocketClient} from "../../utils";
+import {createResumeRSocketClient, createRSocketClient} from "../../utils";
+import {useForm} from "antd/es/form/Form";
 
 
 type LayoutType = Parameters<typeof Form>[0]['layout'];
@@ -26,16 +27,18 @@ const formItemLayout = {
 
 
 const initialValues = {
+  // websocketHost: 'evelynn.jinuo.fun:10081',
   websocketHost: '127.0.0.1:10081',
   KeepAlive: 1000000,
   lifetime: 1000000,
   dataMimeType: 'text/plain',
-  metadataMimeType: 'text/plain'
+  metadataMimeType: 'text/plain',
+  useResume: false
 }
-
 
 const FormData: FC = ({setIsModalVisible}: any) => {
 
+  const [form] = useForm()
   const [num, setNum] = useState(0)
 
   const configuration = useSelector((state) => {
@@ -55,43 +58,55 @@ const FormData: FC = ({setIsModalVisible}: any) => {
     form.validateFields()
       .then(async result => {
           disPatch(configure(result))
-          const rsocket = await createRSocketClient()
+          let rsocket;
+          if (result.useResume) {
+            rsocket = await createResumeRSocketClient()
+
+          } else {
+            rsocket = await createRSocketClient()
+          }
           //更新RScoket状态实例
           disPatch(updateRScoketInstance(rsocket))
-          message.success('connect success !!!')
+          message.success('connect success')
           //关闭modal
           setIsModalVisible(false)
         }
       )
       .catch(err => {
         console.error(err);
-        message.error('whoops error')
+        message.error(err)
       })
   };
 
 
-  const onTest = (form: FormInstance) => {
+  const onTest = () => {
+    // console.log(form.getFieldsValue())
     form.validateFields()
       .then(async result => {
+          console.log("=============", result)
           disPatch(configure(result))
-          const rsocket = await createRSocketClient()
-          message.success('connect success !!!')
+          let rsocket;
+          if (result.useResume) {
+            rsocket = await createResumeRSocketClient()
+          } else {
+            rsocket = await createRSocketClient()
+          }
+          message.success('connect success ')
         }
       )
       .catch(err => {
+        message.error('connection fail')
         console.error(err);
-        message.error('whoops error')
       })
   }
 
   // disPatch(configure(configuration))
-  const [form] = Form.useForm();
   return (
     <>
       <Form
+        form={form}
         {...formItemLayout}
         layout={'horizontal'}
-        form={form}
         onFinish={onFinish}
         initialValues={initialValues}
       >
@@ -145,6 +160,10 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           <TextArea/>
         </Form.Item>
 
+        <Form.Item label={"resume"} name="useResume" valuePropName="checked">
+          <Switch/>
+        </Form.Item>
+
 
         <footer css={css`
           display: flex;
@@ -153,7 +172,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
 
           <Form.Item>
             <Button type="primary" onClick={() => {
-              onTest(form)
+              onTest()
             }}>
               test
             </Button>
