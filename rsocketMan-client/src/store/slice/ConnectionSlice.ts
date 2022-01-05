@@ -5,8 +5,7 @@ export interface Connection {
   rsocket: ReactiveSocket<string, string> | null
   status: string
   error: object | null
-  host: string
-  port: number
+  websocketURL:string
   KeepAlive: number
   metadataMimeType: string
   metadata?: string
@@ -16,8 +15,7 @@ export interface Connection {
 }
 
 const initialState: Connection = {
-  host: "",
-  port: 0,
+  websocketURL:'',
   lifetime: 0,
   rsocket: null,
   status: 'CONNECTING',
@@ -29,7 +27,7 @@ const initialState: Connection = {
 
 
 type initialValues = {
-  websocketHost: string,
+  websocketURL: string,
   KeepAlive: number,
   lifetime: number,
   dataMimeType: string,
@@ -41,9 +39,7 @@ export const connectionSlice = createSlice({
   initialState,
   reducers: {
     configure: (state, action: PayloadAction<initialValues>) => {
-      const host = action.payload.websocketHost?.split(':')[0]
-      const port = Number(action.payload.websocketHost?.split(':')[1])
-      return {...state, ...action.payload, host, port}
+      return {...state, ...action.payload}
     },
     updateRScoketInstance: (state, action) => {
       console.log(action.payload)

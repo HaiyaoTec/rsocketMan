@@ -27,8 +27,7 @@ const formItemLayout = {
 
 
 const initialValues = {
-  // websocketHost: 'evelynn.jinuo.fun:10081',
-  websocketHost: '127.0.0.1:10081',
+  websocketURL: 'ws://127.0.0.1:10081',
   KeepAlive: 1000000,
   lifetime: 1000000,
   dataMimeType: 'text/plain',
@@ -111,14 +110,14 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         initialValues={initialValues}
       >
 
-        <Form.Item name={"websocketHost"} required={true} label="Websocket Host"
+        <Form.Item name={"websocketURL"} required={true} label="Websocket URL"
                    rules={[
                      {
                        required: true,
-                       message: 'Please input your Websocket Host',
+                       message: 'Please input your Websocket URL',
                      },
                    ]}>
-          <Input placeholder="eg:127.0.0.1:8080"/>
+          <Input placeholder="eg:ws://127.0.0.1:8080"/>
         </Form.Item>
 
         <Form.Item name={"KeepAlive"} required={true} label="KeepAlive" hasFeedback={true}

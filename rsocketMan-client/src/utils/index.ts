@@ -80,55 +80,56 @@ export const transformMetaData = (data: unknown, type: type, route = '') => {
  */
 export async function createRSocketClient() {
 
-return new Promise((resolve, reject)=>{
-  //获取配置信息
-  const configuration = store.getState().connection
-  console.log(configuration)
-  const transportOptions = {
-    debug: true,
-    url: `ws://${configuration.host}:${configuration.port}`,
+  return new Promise((resolve, reject) => {
+    //获取配置信息
+    const configuration = store.getState().connection
+    console.log(configuration)
+    const transportOptions = {
+      debug: true,
+      url: `${configuration.websocketURL}`,
+      wsCreator: (url: string | URL) => {
+        return new WebSocket(url);
+      }
+    };
+    // const route = 'page/abc'
 
-    wsCreator: (url: string | URL) => {
-      return new WebSocket(url);
-    }
-  };
-  // const route = 'page/abc'
+    const setupOptions = {
+      keepAlive: `${configuration.KeepAlive}`,
+      lifetime: `${configuration.lifetime}`,
+      dataMimeType: `${configuration.dataMimeType}`,
+      // metadataMimeType: `${configuration.metadataMimeType}`
+      metadataMimeType: `${MESSAGE_RSOCKET_COMPOSITE_METADATA.string}`
+      ,
+      payload: {
+        //transformData(configuration.metadata, configuration.metadataMimeType)
+        //@ts-ignore
+        // metadata:encodeCompositeMetadata([[APPLICATION_JSON,Buffer.from(JSON.stringify({"sessionId":"u20as","clientId":"123141231","clientType":"browser"}))]]),
+        metadata: transformMetaData(configuration?.metadata, configuration.metadataMimeType),
+        // data: `${Buffer.from(transformData(configuration?.data, configuration.dataMimeType)as string)}`
+        // metadata: `${transformData(configuration?.metadata, configuration.metadataMimeType)}`,
+        data: (transformData(configuration?.data, configuration.dataMimeType) ?? "")
+      }
+    };
 
-  const setupOptions = {
-    keepAlive: `${configuration.KeepAlive}`,
-    lifetime: `${configuration.lifetime}`,
-    dataMimeType: `${configuration.dataMimeType}`,
-    // metadataMimeType: `${configuration.metadataMimeType}`
-    metadataMimeType: `${MESSAGE_RSOCKET_COMPOSITE_METADATA.string}`
-    ,
-    payload: {
-      //transformData(configuration.metadata, configuration.metadataMimeType)
-      //@ts-ignore
-      // metadata:encodeCompositeMetadata([[APPLICATION_JSON,Buffer.from(JSON.stringify({"sessionId":"u20as","clientId":"123141231","clientType":"browser"}))]]),
-      metadata: transformMetaData(configuration?.metadata, configuration.metadataMimeType),
-      // data: `${Buffer.from(transformData(configuration?.data, configuration.dataMimeType)as string)}`
-      // metadata: `${transformData(configuration?.metadata, configuration.metadataMimeType)}`,
-      data: (transformData(configuration?.data, configuration.dataMimeType) ?? "")
-    }
-  };
-
-  const transport = new RSocketWebsocketClient(transportOptions, BufferEncoders);
-  // @ts-ignore
-  const client = new RSocketClient({setup: setupOptions, transport});
-  const rsocket=client.connect()
-  setTimeout(()=>{reject('连接超时')},3000)
-  rsocket.subscribe({
-    onComplete:(client)=>{
-      //TODO 需要修改
-      console.log('连接成功')
-      resolve(client)
-    },
-    onError:(e)=>{
-      console.log(e)
-      reject('连接错误')
-    }
-  });
-})
+    const transport = new RSocketWebsocketClient(transportOptions, BufferEncoders);
+    // @ts-ignore
+    const client = new RSocketClient({setup: setupOptions, transport});
+    const rsocket = client.connect()
+    setTimeout(() => {
+      reject('连接超时')
+    }, 3000)
+    rsocket.subscribe({
+      onComplete: (client) => {
+        //TODO 需要修改
+        console.log('连接成功')
+        resolve(client)
+      },
+      onError: (e) => {
+        console.log(e)
+        reject('连接错误')
+      }
+    });
+  })
 
 }
 
@@ -136,65 +137,66 @@ return new Promise((resolve, reject)=>{
  * 创建 ResumeRsocket client instance的方法
  * @param options
  */
-export  function createResumeRSocketClient() {
+export function createResumeRSocketClient() {
 
-return new Promise((resolve, reject)=>{
-  //获取配置信息
-  const configuration = store.getState().connection
-  console.log(configuration)
-  const transportOptions = {
-    debug: true,
-    url: `ws://${configuration.host}:${configuration.port}`,
+  return new Promise((resolve, reject) => {
+    //获取配置信息
+    const configuration = store.getState().connection
+    console.log(configuration)
+    const transportOptions = {
+      debug: true,
+      url: `${configuration.websocketURL}`,
+      wsCreator: (url: string | URL) => {
+        return new WebSocket(url);
+      }
+    };
+    const resumeToken = Buffer.from(nanoid());
+    const bufferSize = 128;
+    const sessionDurationSeconds = 300;
 
-    wsCreator: (url: string | URL) => {
-      return new WebSocket(url);
-    }
-  };
-  const resumeToken = Buffer.from(nanoid());
-  const bufferSize = 128;
-  const sessionDurationSeconds = 300;
+    // Create an instance of a client
+    const resumableTransport = new RSocketResumableTransport(
+      // supplier of low-level transport
+      () => new RSocketWebsocketClient(transportOptions, BufferEncoders),
+      {
+        bufferSize, // max number of sent & pending frames to buffer before failing
+        resumeToken, // unique identifier the session across connections
+        sessionDurationSeconds,
+      },
+      BufferEncoders,
+    );
 
-  // Create an instance of a client
-  const resumableTransport = new RSocketResumableTransport(
-    // supplier of low-level transport
-    () => new RSocketWebsocketClient(transportOptions, BufferEncoders),
-    {
-      bufferSize, // max number of sent & pending frames to buffer before failing
-      resumeToken, // unique identifier the session across connections
-      sessionDurationSeconds,
-    },
-    BufferEncoders,
-  );
+    const setupOptions = {
+      keepAlive: `${configuration.KeepAlive}`,
+      lifetime: `${configuration.lifetime}`,
+      dataMimeType: `${configuration.dataMimeType}`,
+      // metadataMimeType: `${configuration.metadataMimeType}`
+      metadataMimeType: `${MESSAGE_RSOCKET_COMPOSITE_METADATA.string}`
+      ,
+      payload: {
+        metadata: transformMetaData(configuration?.metadata, configuration.metadataMimeType),
+        data: (transformData(configuration?.data, configuration.dataMimeType) ?? "")
+      }
+    };
 
-  const setupOptions = {
-    keepAlive: `${configuration.KeepAlive}`,
-    lifetime: `${configuration.lifetime}`,
-    dataMimeType: `${configuration.dataMimeType}`,
-    // metadataMimeType: `${configuration.metadataMimeType}`
-    metadataMimeType: `${MESSAGE_RSOCKET_COMPOSITE_METADATA.string}`
-    ,
-    payload: {
-      metadata: transformMetaData(configuration?.metadata, configuration.metadataMimeType),
-      data: (transformData(configuration?.data, configuration.dataMimeType) ?? "")
-    }
-  };
-
-  // @ts-ignore
-  const client = new RSocketClient({setup: setupOptions, transport: resumableTransport});
-  const rsocket=client.connect()
-  setTimeout(()=>{reject('连接超时')},3000)
-  rsocket.subscribe({
-    onComplete:(client)=>{
-      //TODO 需要修改
-      console.log('连接成功')
-      resolve(client)
-    },
-    onError:(e)=>{
-      message.error('连接错误！！！')
-      reject('连接错误')
-    }
-  });
-})
+    // @ts-ignore
+    const client = new RSocketClient({setup: setupOptions, transport: resumableTransport});
+    const rsocket = client.connect()
+    setTimeout(() => {
+      reject('连接超时')
+    }, 3000)
+    rsocket.subscribe({
+      onComplete: (client) => {
+        //TODO 需要修改
+        console.log('连接成功')
+        resolve(client)
+      },
+      onError: (e) => {
+        message.error('连接错误！！！')
+        reject('连接错误')
+      }
+    });
+  })
 
 }
 
@@ -241,14 +243,14 @@ export const requestResponse = (value: { id: string, method: string, route?: str
           //将buffer转换为string
           response = {...response, data: response.data?.toString()}
           //
-          response=Object.assign(response,{success:true})
+          response = Object.assign(response, {success: true})
           receiveAndUpdateUI(value, response, _cancel)
         },
         onError: (error) => {
           //TODO 添加错误消息
           console.log(error);
           //将buffer转换为string
-          let response={success:false,data:`${error}`,metadata:''}
+          let response = {success: false, data: `${error}`, metadata: ''}
           receiveAndUpdateUI(value, response, _cancel)
         },
         onSubscribe: (cancel) => {
@@ -280,7 +282,7 @@ export const requestStream = (value: { id: string, method: string, route?: strin
         onNext: (response) => {
           //将buffer转换为string
           response = {...response, data: response.data?.toString()}
-          response=Object.assign(response,{success:true})
+          response = Object.assign(response, {success: true})
           receiveAndUpdateUI(value, response, _cancel)
         },
         onComplete: () => {
@@ -290,7 +292,7 @@ export const requestStream = (value: { id: string, method: string, route?: strin
           //TODO 添加错误消息
           console.log(error);
           //将buffer转换为string
-          let response={success:false,data:`${error}`,metadata:''}
+          let response = {success: false, data: `${error}`, metadata: ''}
           receiveAndUpdateUI(value, response, _cancel)
         },
         onSubscribe: ({cancel, request}) => {
@@ -324,7 +326,7 @@ export const requestChannel = (value: { id: string, method: string, route?: stri
         onNext: (response) => {
           //将buffer转换为string
           response = {...response, data: response.data?.toString()}
-          response=Object.assign(response,{success:true})
+          response = Object.assign(response, {success: true})
           receiveAndUpdateUI(value, response, _cancel)
         },
         onComplete: () => {
@@ -334,7 +336,7 @@ export const requestChannel = (value: { id: string, method: string, route?: stri
           //TODO 添加错误消息
           console.log(error);
           //将buffer转换为string
-          let response={success:false,data:`${error}`,metadata:''}
+          let response = {success: false, data: `${error}`, metadata: ''}
           receiveAndUpdateUI(value, response, _cancel)
         },
         onSubscribe: ({cancel, request}) => {
