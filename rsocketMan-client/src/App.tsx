@@ -14,16 +14,16 @@ import {store} from "./store/store";
 import SideBarItem from "./components/SideBarItem/SideBarItem";
 import {addRequestItem, updateRequestItem} from "./store/slice/RequestSlice";
 import {nanoid} from 'nanoid'
-import {Route, Routes} from 'react-router-dom';
+import {Route, Routes,useNavigate} from 'react-router-dom';
 
 const {Footer, Sider, Content} = Layout;
 
 function App() {
   const [count, setCount] = useState(0)
+  const navigate = useNavigate();
   const requestItems = useSelector((state) => state.requestSliceReducer)
   console.log(requestItems)
   useEffect(() => {
-    // run().then(resulet=>console.log('success')).catch(err=>console.log('err'))
   }, [])
 
 

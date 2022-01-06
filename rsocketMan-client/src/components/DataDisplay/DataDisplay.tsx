@@ -206,13 +206,17 @@ const DataDisplay: FC = () => {
                         width: 600px;
                         background-color: #31383e;
                         margin-bottom: 15px;
-
+                        cursor: pointer;
                         &:hover {
                           background-color: #1b1e21
                         }
 
                         border: 2px solid #ccc;
                       `}
+                      onClick={() => {
+                        // @ts-ignore
+                        setDataItem(item);
+                      }}
                     >
                       {/*  item top*/}
                       <div
@@ -274,13 +278,12 @@ const DataDisplay: FC = () => {
                             overflow: hidden;
                             color: #ffffff;
                             text-overflow: ellipsis;
-                            white-space: nowrap;
+                            white-space: nowrap
                           `}
                         >
-                          {JSON.stringify({
-                            data: item?.data,
-                            metadata: item?.metadata,
-                          })}
+                          {
+                            item?.data
+                          }
                         </span>
                         <span
                           css={css`
@@ -293,10 +296,6 @@ const DataDisplay: FC = () => {
                             cursor: pointer;
                             font-size: 16px;
                           `}
-                          onClick={() => {
-                            // @ts-ignore
-                            setDataItem(item);
-                          }}
                         >
                           View All
                         </span>

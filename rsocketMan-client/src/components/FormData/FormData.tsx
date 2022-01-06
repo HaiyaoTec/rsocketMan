@@ -7,10 +7,12 @@ import {useDispatch, useSelector} from 'react-redux'
 import {configure, updateRScoketInstance} from "../../store/slice/ConnectionSlice";
 import {createResumeRSocketClient, createRSocketClient} from "../../utils";
 import {useForm} from "antd/es/form/Form";
-
+import {nanoid} from "nanoid";
+import {store} from "../../store/store";
+import {addRequestItem} from "../../store/slice/RequestSlice";
+import {useNavigate} from "react-router-dom";
 
 type LayoutType = Parameters<typeof Form>[0]['layout'];
-
 const {TextArea} = Input
 const {Option} = Select
 
@@ -30,8 +32,8 @@ const initialValues = {
   websocketURL: 'ws://127.0.0.1:10081',
   KeepAlive: 1000000,
   lifetime: 1000000,
-  dataMimeType: 'text/plain',
-  metadataMimeType: 'text/plain',
+  dataMimeType: 'application/json',
+  metadataMimeType: 'application/json',
   useResume: false
 }
 
@@ -39,7 +41,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
 
   const [form] = useForm()
   const [num, setNum] = useState(0)
-
+  const navigate = useNavigate();
   const configuration = useSelector((state) => {
     return state
   })
@@ -69,6 +71,16 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           message.success('connect success')
           //关闭modal
           setIsModalVisible(false)
+          const nanoID = nanoid()
+          store.dispatch(addRequestItem({
+            id: `${nanoID}`,
+            metadata: '',
+            route: '/xxx/xxx',
+            data: '',
+            receive: [],
+            method: 'fireAndForget'
+          }))
+          navigate(`/${nanoID}`)
         }
       )
       .catch(err => {
@@ -144,6 +156,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         <Form.Item name={"metadata"} label="metadata">
           <TextArea/>
         </Form.Item>
+
         <Form.Item
           name="dataMimeType"
           label="dataMimeType"
@@ -158,7 +171,6 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         <Form.Item name={"data"} label="data">
           <TextArea/>
         </Form.Item>
-
         <Form.Item label={"resume"} name="useResume" valuePropName="checked">
           <Switch/>
         </Form.Item>

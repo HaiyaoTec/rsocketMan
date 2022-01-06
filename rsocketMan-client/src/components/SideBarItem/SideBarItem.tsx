@@ -10,6 +10,7 @@ import {addRequestItem, RequestSliceItem} from "../../store/slice/RequestSlice";
 import {store} from "../../store/store";
 import {nanoid} from "nanoid";
 
+
 type prosType = {
   info: RequestSliceItem
 }
@@ -78,7 +79,9 @@ const SideBarItem: FC<prosType> = ({info}) => {
           } onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            store.dispatch(addRequestItem({...info, id: nanoid(), receive: []}))
+            const nanoID=nanoid()
+            store.dispatch(addRequestItem({...info, id: nanoID, receive: []}))
+            navigate(nanoID)
           }}>COPY</span>
         </div>
       </div>
