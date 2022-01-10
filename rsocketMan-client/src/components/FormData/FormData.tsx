@@ -11,18 +11,22 @@ import {nanoid} from "nanoid";
 import {store} from "../../store/store";
 import {addRequestItem} from "../../store/slice/RequestSlice";
 import {useNavigate} from "react-router-dom";
+import arrow_down from './assets/drop-down-arrow.svg'
+import {Collapse} from 'antd';
+import {CaretRightOutlined} from '@ant-design/icons';
+import './css/index.css'
 
+const {Panel} = Collapse;
 type LayoutType = Parameters<typeof Form>[0]['layout'];
 const {TextArea} = Input
 const {Option} = Select
-
 const formItemLayout = {
   labelCol: {
-    xs: {span: 30},
-    sm: {span: 8},
+    xs: {span: 32},
+    sm: {span: 10},
   },
   wrapperCol: {
-    xs: {span: 30},
+    xs: {span: 32},
     sm: {span: 14},
   },
 };
@@ -34,8 +38,11 @@ const initialValues = {
   lifetime: 1000000,
   dataMimeType: 'application/json',
   metadataMimeType: 'application/json',
-  useResume: false
+  useResume: false,
+  sessionDuration: 6000,
+  token: `${nanoid()}`
 }
+
 
 const FormData: FC = ({setIsModalVisible}: any) => {
 
@@ -131,77 +138,111 @@ const FormData: FC = ({setIsModalVisible}: any) => {
                    ]}>
           <Input placeholder="eg:ws://127.0.0.1:8080"/>
         </Form.Item>
-
-        <Form.Item name={"KeepAlive"} required={true} label="KeepAlive" hasFeedback={true}
-                   rules={[{required: true, message: 'Please set KeepAlive'}]}>
-          <Input type={"number"} placeholder="eg:1000000"/>
-        </Form.Item>
-
-        <Form.Item name={"lifetime"} required={true} label="lifetime" hasFeedback={true}
-                   rules={[{required: true, message: 'Please set lifetime'}]}>
-          <Input type={"number"} placeholder="eg:1000"/>
-        </Form.Item>
-
         <Form.Item
           name="metadataMimeType"
-          label="metadataMimeType"
+          label="Metadata"
           hasFeedback
           rules={[{required: true, message: 'Please select your Metadata type!'}]}
         >
-          <Select placeholder="Please select metadataMimeType">
-            <Option value="application/json">application/json</Option>
-            <Option value="text/plain">text/plain</Option>
+          <Select suffixIcon={<img css={css`width: 12px`} src={arrow_down}/>}
+                  placeholder="Please select metadataMimeType">
+            <Option value="application/json">JSON - application/json</Option>
+            <Option value="text/plain">TEXT - text/plain</Option>
           </Select>
         </Form.Item>
-        <Form.Item name={"metadata"} label="metadata">
+        <Form.Item name={"metadata"} label="SetUp Metadata">
           <TextArea/>
         </Form.Item>
 
         <Form.Item
           name="dataMimeType"
-          label="dataMimeType"
+          label="Payload"
           hasFeedback
           rules={[{required: true, message: 'Please select  dataMimeType!'}]}
         >
-          <Select placeholder="Please select dataMimeType">
-            <Option value="application/json">application/json</Option>
-            <Option value="text/plain">text/plain</Option>
+          <Select placeholder="Please select dataMimeType" suffixIcon={<img css={css`width: 12px`} src={arrow_down}/>}>
+            <Option value="application/json">JSON - application/json</Option>
+            <Option value="text/plain">TEXT - text/plain</Option>
           </Select>
         </Form.Item>
-        <Form.Item name={"data"} label="data">
+        <Form.Item name={"data"} label="SetUp Payload">
           <TextArea/>
         </Form.Item>
-        <Form.Item label={"resume"} name="useResume" valuePropName="checked">
-          <Switch/>
-        </Form.Item>
+        <Collapse
+          bordered={false}
+          defaultActiveKey={['0']}
+          expandIcon={({isActive}) => <CaretRightOutlined rotate={isActive ? 90 : 0}/>}
+          className="site-collapse-custom-collapse"
+        >
+          <Panel forceRender={true} header="Detail Config" key="1" className="site-collapse-custom-panel">
+            <div>
+              <Form.Item className={'resumeItem'} label={"resume"} name="useResume" valuePropName="checked">
+                <Switch/>
+              </Form.Item>
 
+              <Form.Item name={"sessionDuration"} required={true} label="Session Duration" hasFeedback={true}
+                         rules={[{required: true, message: 'Please set Session Duration'}]}>
+                <Input type={"number"} placeholder="6000ms"/>
+              </Form.Item>
 
+              <Form.Item name={"token"} required={true} label="Token" hasFeedback={true}
+                         rules={[{required: true, message: 'Please set Token'}]}>
+                <Input type={"string"} placeholder="eg: g2t672389jsae78sj1f"/>
+              </Form.Item>
+
+              <Form.Item name={"KeepAlive"} required={true} label="KeepAlive interval" hasFeedback={true}
+                         rules={[{required: true, message: 'Please set KeepAlive interval'}]}>
+                <Input type={"number"} placeholder="eg:30000ms"/>
+              </Form.Item>
+
+              <Form.Item name={"lifetime"} required={true} label="KeepAlive  max lifetime" hasFeedback={true}
+                         rules={[{required: true, message: 'Please set lifetime'}]}>
+                <Input type={"number"} placeholder="eg:1000"/>
+              </Form.Item>
+            </div>
+          </Panel>
+        </Collapse>
         <footer css={css`
           display: flex;
-          justify-content: space-around;
+          flex-direction: row-reverse;
+          margin-right: 20px;
         `}>
-
           <Form.Item>
-            <Button type="primary" onClick={() => {
+            <Button css={css`
+              width: 120px;
+              height: 44px;
+              background-color: #7297FC;
+              border-radius: 16px;
+              border: 0;
+              font-family: Poppins, serif;
+              font-style: normal;
+              font-weight: 600;
+              font-size: 14px;
+              line-height: 14px;
+            `} type="primary" htmlType="submit">
+              Connect
+            </Button>
+          </Form.Item>
+
+          <Form.Item css={css`margin-right: 24px`}>
+            <Button css={css`
+              width: 120px;
+              height: 44px;
+              background-color: #FF6C87;
+              border-radius: 16px;
+              border: 0;
+              font-family: Poppins, serif;
+              font-style: normal;
+              font-weight: 600;
+              font-size: 14px;
+              line-height: 14px;
+            `} type="primary" onClick={() => {
               onTest()
             }}>
-              test
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              connect
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="reset">
-              Reset
+              Test
             </Button>
           </Form.Item>
         </footer>
-
       </Form>
     </>
   );

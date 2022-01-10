@@ -19,20 +19,19 @@ const SideBarItem: FC<prosType> = ({info}) => {
   let navigate = useNavigate()
   return (
     <div css={css`& > :hover {
-      background-color: #1c1e22
+      background-color: #384571
     }`}>
       <div
         css={
           css`
             width: 100%;
-            height: 150px;
-            background-color: #31383e;
-            padding: 16px;
+            background-color: #252730;
+            padding: 20px;
             border: 1px solid #000000;
             border-left: 0;
             border-right: 0;
-            margin-top: -2px;
             cursor: pointer;
+            border-radius: 3px;
           `
         }
         // onClick={()=>{dispatch(updateDataDisplay({...info,show:true}))}}
@@ -43,20 +42,30 @@ const SideBarItem: FC<prosType> = ({info}) => {
         {/*top*/}
         <div css={css`display: flex;
           justify-content: space-between`}>
-          <span css={css`padding: 5px;
-            background-color: #0994fb;
+          <span css={css`
+            line-height: 24px;
+            font-size: 16px;
+            font-family: Poppins, serif;
+            font-style: normal;
+            font-weight: 600;
+            color: #7699FC;
+          `}>{info.method}</span>
+          <span css={css`
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            background-color: #2EC13D;
             color: #FFFFFF;
-            border-radius: 6px`}>{info.method}</span>
-          <span css={css`padding: 5px 20px;
-            background-color: #20d230;
-            color: #FFFFFF;
-            border-radius: 6px`}>{info.receive!.length}</span>
+            border-radius: 50%`}>{info.receive!.length}</span>
         </div>
         {/*  route*/}
         <div css={css`
-          padding: 10px 0;
           color: #FFFFFF;
-          font-size: 20px`}>
+          margin-top: 14px;
+          font-weight: bold;
+          font-size: 14px`}>
           <span>{info.route}</span>
         </div>
         {/*  data*/}
@@ -66,20 +75,20 @@ const SideBarItem: FC<prosType> = ({info}) => {
           justify-content: space-between`}>
           <span css={css`max-width: 70%;
             display: inline-block;
+            color: #FFFFFF54;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;`}>{info.data}</span>
+            white-space: nowrap;`}>{`${info.receive![0]?.data??''}`}</span>
           <span css={
             css
-              ` color: #2e5bf9;
-                border-radius: 6px;
+              ` color: #7699FC;
                 font-weight: bold;
                 cursor: pointer;
               `
           } onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            const nanoID=nanoid()
+            const nanoID = nanoid()
             store.dispatch(addRequestItem({...info, id: nanoID, receive: []}))
             navigate(nanoID)
           }}>COPY</span>

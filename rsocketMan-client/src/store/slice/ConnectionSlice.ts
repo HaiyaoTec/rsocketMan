@@ -12,6 +12,9 @@ export interface Connection {
   dataMimeType: string
   data?: string
   lifetime: number
+  //resume need
+  sessionDuration?:number
+  token?:string
 }
 
 const initialState: Connection = {
@@ -23,6 +26,9 @@ const initialState: Connection = {
   dataMimeType: "",
   KeepAlive: 0,
   metadataMimeType: "",
+  //resume need
+  sessionDuration:0,
+  token:''
 }
 
 

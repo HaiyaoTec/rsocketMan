@@ -14,6 +14,7 @@ import './css/index.css'
 import prettier from 'prettier'
 //@ts-ignore
 import parserBabel from "prettier/esm/parser-babel.mjs";
+import arrow_down from "../FormData/assets/drop-down-arrow.svg";
 
 
 type LayoutType = Parameters<typeof Form>[0]["layout"];
@@ -110,6 +111,7 @@ const DataDisplay: FC = () => {
           css={css`
             display: flex;
             height: 100%;
+            border-radius: 3px;
           `}
         >
           {/*  left*/}
@@ -130,7 +132,10 @@ const DataDisplay: FC = () => {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                background-color: #262b30;
+                background-color: #252730;
+                border-radius: 3px;
+                margin-bottom:16px;
+                padding-top: 40px;
               `}
             >
               <Form
@@ -140,6 +145,7 @@ const DataDisplay: FC = () => {
                 onFinish={onFinish}
               >
                 <Form.Item
+                  className={"custom_method_input"}
                   name="method"
                   label="Method"
                   css={css`font-weight: bold;`}
@@ -148,24 +154,14 @@ const DataDisplay: FC = () => {
                     {required: true, message: "Please select your method!"},
                   ]}
                 >
-                  <Select placeholder="Please select method">
+                  <Select  suffixIcon={<img css={css`width: 12px`} src={arrow_down}/>} placeholder="Please select method">
                     <Option value="fireAndForget">fireAndForget</Option>
                     <Option value="requestResponse">requestResponse</Option>
                     <Option value="requestStream">requestStream</Option>
                     <Option value="requestChannel">requestChannel</Option>
                   </Select>
-                </Form.Item>
-                <Form.Item name={"route"} required={false} label="Route" css={css`font-weight: bold;`}>
-                  <Input placeholder="eg: xxx/xxx"/>
-                </Form.Item>
-                <Form.Item name={"metadata"} label="Metadata" css={css`font-weight: bold;`}>
-                  <TextArea/>
-                </Form.Item>
-                <Form.Item name={"data"} label="Data" css={css`font-weight: bold;`}>
-                  <TextArea/>
-                </Form.Item>
-                <Form.Item label={"Submit"} css={css`font-weight: bold;`}>
                   <Button
+                    className={"custom_submit"}
                     type="primary"
                     htmlType="submit"
                     css={css`
@@ -177,12 +173,22 @@ const DataDisplay: FC = () => {
                     Send
                   </Button>
                 </Form.Item>
+
+                <Form.Item name={"route"} required={false} label="Route" css={css`font-weight: bold;`}>
+                  <Input placeholder="eg: xxx/xxx"/>
+                </Form.Item>
+                <Form.Item name={"metadata"} label="Metadata" css={css`font-weight: bold;`}>
+                  <TextArea/>
+                </Form.Item>
+                <Form.Item name={"data"} label="Payload" css={css`font-weight: bold;`}>
+                  <TextArea/>
+                </Form.Item>
               </Form>
             </div>
             {/*  leftBottom*/}
             <div
               css={css`
-                background-color: #252b30;
+                background-color: #252730;
                 border: 1px solid #000000;
                 border-top: 0;
                 flex: 1;
