@@ -15,6 +15,13 @@ import prettier from 'prettier'
 //@ts-ignore
 import parserBabel from "prettier/esm/parser-babel.mjs";
 import arrow_down from "../FormData/assets/drop-down-arrow.svg";
+import {CaretRightOutlined} from '@ant-design/icons';
+import {Collapse} from 'antd';
+import MessageItem from "../MessageItem/MessageItem";
+import DataShow from '../DataShow/DataShow'
+import CustomerCodeMirror from "../CodeMirror/CodeMirror";
+
+const {Panel} = Collapse;
 
 
 type LayoutType = Parameters<typeof Form>[0]["layout"];
@@ -22,12 +29,12 @@ const {Option} = Select;
 
 const formItemLayout = {
   labelCol: {
-    xs: {span: 30},
+    xs: {span: 5},
     sm: {span: 5},
   },
   wrapperCol: {
-    xs: {span: 30},
-    sm: {span: 14},
+    xs: {span: 16},
+    sm: {span: 16},
   },
 };
 // window.location.reload();
@@ -102,6 +109,7 @@ const DataDisplay: FC = () => {
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
+  // @ts-ignore
   return (
     // !dataDisplayData.show?
     //   <div>123</div>:
@@ -119,8 +127,8 @@ const DataDisplay: FC = () => {
             css={css`
               display: flex;
               flex-direction: column;
-              min-width: 700px;
-              width: 50%;
+              width: 644px;
+              min-width: 644px;
             `}
           >
             {/*  leftTop*/}
@@ -134,7 +142,7 @@ const DataDisplay: FC = () => {
                 justify-content: center;
                 background-color: #252730;
                 border-radius: 3px;
-                margin-bottom:16px;
+                margin-bottom: 16px;
                 padding-top: 40px;
               `}
             >
@@ -144,22 +152,25 @@ const DataDisplay: FC = () => {
                 form={form}
                 onFinish={onFinish}
               >
-                <Form.Item
-                  className={"custom_method_input"}
-                  name="method"
-                  label="Method"
-                  css={css`font-weight: bold;`}
-                  hasFeedback
-                  rules={[
-                    {required: true, message: "Please select your method!"},
-                  ]}
-                >
-                  <Select  suffixIcon={<img css={css`width: 12px`} src={arrow_down}/>} placeholder="Please select method">
-                    <Option value="fireAndForget">fireAndForget</Option>
-                    <Option value="requestResponse">requestResponse</Option>
-                    <Option value="requestStream">requestStream</Option>
-                    <Option value="requestChannel">requestChannel</Option>
-                  </Select>
+                <div className={"custom_box"}>
+                  <Form.Item
+                    className={"custom_method_input"}
+                    name="method"
+                    label="Method"
+                    css={css`font-weight: bold;`}
+                    hasFeedback
+                    rules={[
+                      {required: true, message: "Please select your method!"},
+                    ]}
+                  >
+                    <Select suffixIcon={<img css={css`width: 12px`} src={arrow_down}/>}
+                            placeholder="Please select method">
+                      <Option value="fireAndForget">fireAndForget</Option>
+                      <Option value="requestResponse">requestResponse</Option>
+                      <Option value="requestStream">requestStream</Option>
+                      <Option value="requestChannel">requestChannel</Option>
+                    </Select>
+                  </Form.Item>
                   <Button
                     className={"custom_submit"}
                     type="primary"
@@ -170,18 +181,34 @@ const DataDisplay: FC = () => {
                       background-color: #4ac2dd;
                     `}
                   >
-                    Send
+                    SEND
                   </Button>
-                </Form.Item>
+                </div>
 
                 <Form.Item name={"route"} required={false} label="Route" css={css`font-weight: bold;`}>
                   <Input placeholder="eg: xxx/xxx"/>
                 </Form.Item>
-                <Form.Item name={"metadata"} label="Metadata" css={css`font-weight: bold;`}>
-                  <TextArea/>
-                </Form.Item>
+                <Collapse
+                  bordered={false}
+                  defaultActiveKey={['0']}
+                  expandIcon={({isActive}) => <span css={css`color: #7699FC;
+                    font-weight: 500 !important;
+                    font-size: 14px !important;
+                    line-height: 22px !important;`}>&nbsp;&nbsp;&nbsp;Add Metadata</span>}
+                  className="site-collapse-custom-collapse"
+                >
+                  <Panel forceRender={true} header="Metadata:" key="1"
+                         className="metadata-item site-collapse-custom-panel">
+                    <Form.Item name={"metadata"} label="" css={css`font-weight: bold;
+                      margin-left: 120px;
+                      width: 638px`}>
+                      <CustomerCodeMirror formRef={form} field={"metadata"}/>
+                    </Form.Item>
+                  </Panel>
+                </Collapse>
+
                 <Form.Item name={"data"} label="Payload" css={css`font-weight: bold;`}>
-                  <TextArea/>
+                  <CustomerCodeMirror formRef={form} field={"data"}/>
                 </Form.Item>
               </Form>
             </div>
@@ -198,115 +225,23 @@ const DataDisplay: FC = () => {
                 css`
                   margin-left: 30px;
                   font-weight: bold;
-                  color: #ffffff;
-                `}>Receive</h2>
+                  font-family: Poppins, serif;
+                  position: sticky;
+                  height: 40px;
+                  line-height: 40px;
+                  top: 57px;
+                  color: #9c9ea2;
+                `}>
+                Message
+              </h2>
               <div css={css`display: flex;
                 flex-direction: column;
-                align-items: center`}>
+                margin-right: 40px;
+                align-items: flex-end`}>
                 {/*@ts-ignore*/}
                 {receiveItems?.map((item, index) => {
                   return (
-                    <div
-                      key={index}
-                      css={css`
-                        width: 600px;
-                        background-color: #31383e;
-                        margin-bottom: 15px;
-                        cursor: pointer;
-                        &:hover {
-                          background-color: #1b1e21
-                        }
-
-                        border: 2px solid #ccc;
-                      `}
-                      onClick={() => {
-                        // @ts-ignore
-                        setDataItem(item);
-                      }}
-                    >
-                      {/*  item top*/}
-                      <div
-                        css={css`
-                          display: flex;
-                          justify-content: space-between;
-                          padding: 10px 16px;
-                        `}
-                      >
-                        <span>
-                          <span
-                            css={css`
-                              margin-right: 6px;
-                              font-weight: bold;
-                              color: #ffffff;
-                            `}
-                          >
-                            #{receiveItems.length - index}
-                          </span>
-                          {/*消息是正确还是错误的*/}
-                          {
-                            item?.success?
-                              <span
-                                css={css`
-                              color: #71cf40;
-                              font-weight: bold;
-                            `}
-                              >
-                            OK
-                          </span>
-                              :
-                            <span
-                            css={css`
-                              color: red;
-                              font-weight: bold;
-                            `}
-                            >
-                            Error
-                            </span>
-                          }
-
-                        </span>
-                        <span css={css`font-weight: bold;
-                          color: #ffffff`}>{item.date}</span>
-                      </div>
-                      {/*  item bottom*/}
-                      <div
-                        css={css`
-                          display: flex;
-                          justify-content: space-between;
-                          padding: 16px;
-                          font-weight: bold;
-                          align-items: center;
-                        `}
-                      >
-                        <span
-                          css={css`
-                            width: 70%;
-                            overflow: hidden;
-                            color: #ffffff;
-                            text-overflow: ellipsis;
-                            white-space: nowrap
-                          `}
-                        >
-                          {
-                            item?.data
-                          }
-                        </span>
-                        <span
-                          css={css`
-                            display: inline-block;
-                            background-color: #45c0dc;
-                            padding: 3px;
-                            border-radius: 6px;
-                            color: #ffffff;
-                            font-weight: bold;
-                            cursor: pointer;
-                            font-size: 16px;
-                          `}
-                        >
-                          View All
-                        </span>
-                      </div>
-                    </div>
+                    <MessageItem key={index} item={item} index={receiveItems.length - index} setDataItem={setDataItem}/>
                   );
                 })}
               </div>
@@ -314,72 +249,8 @@ const DataDisplay: FC = () => {
           </div>
           {/*  right*/}
           {dataItem && (
-            <div
-              css={css`
-                background-color: #272b30;
-                flex: 1;
-                padding: 16px;
-                min-width: 500px;
-              `}
-            >
-              <div css={css`position: sticky;
-                top: 0`}>
-                {/*data*/}
-                <div
-                  css={css`
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #ffffff;
-                  `}
-                >
-                  Data
-                </div>
-                <pre
-                  css={css`
-                    width: 100%;
-                    min-height: 300px;
-                    max-height: 500px;
-                    border: 1px solid #bbbbbb;
-                    background-color: #31383e;
-                    color: #ffffff;
-                    word-break: break-all;
-                    white-space: break-spaces;
-                    font-weight: bold;
-                  `}
-                >
-                  {/*TODO */}
-                  {
-                    //@ts-ignore
-                    formatData(dataItem?.data)
-                  }
-
-                </pre>
-                <br/>
-                {/*metadata*/}
-                <div
-                  css={css`
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #ffffff;
-                  `}
-                >
-                  Metadata
-                </div>
-                <div
-                  css={css`
-                    width: 100%;
-                    height: 200px;
-                    border: 1px solid #bbbbbb;
-                    background-color: #31383e;
-                    color: #ffffff;
-                    word-break: break-all;
-                    font-weight: bold;
-                  `}
-                >
-                  {/*@ts-ignore*/}
-                  {dataItem?.metadata}
-                </div>
-              </div>
+            <div css={css`margin-left: 16px;flex: 1`}>
+            <DataShow dataItem={dataItem}/>
             </div>
           )}
         </div>

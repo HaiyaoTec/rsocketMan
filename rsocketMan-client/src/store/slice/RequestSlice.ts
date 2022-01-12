@@ -5,6 +5,7 @@ export type receiveItem={
   data?:any
   date?:string
   success?:boolean
+  isSend?:boolean
 }
 export interface RequestSliceItem {
   id: string

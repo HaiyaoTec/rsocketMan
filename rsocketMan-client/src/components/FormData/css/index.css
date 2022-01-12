@@ -3,7 +3,7 @@ background-color: #252730;
 
 }
 
-.site-collapse-custom-panel .ant-collapse-header{
+ .site-collapse-custom-panel .ant-collapse-header{
     display: flex;
     flex-direction: row-reverse;
     justify-content: center;
@@ -14,22 +14,24 @@ background-color: #252730;
     font-size: 16px;
     line-height: 24px;
 }
-.site-collapse-custom-panel .ant-collapse-header:before{
+.form-data  .site-collapse-custom-panel .ant-collapse-header:before{
     display: inline-block;
     color: #4E5C6D2E;
     content: '————---———————---';
 }
-.site-collapse-custom-panel .ant-collapse-header:after{
+.form-data  .site-collapse-custom-panel .ant-collapse-header:after{
     display: inline-block;
     content: '————---———————---';
     color: #4E5C6D2E;
 }
-.ant-collapse-item {
+  .ant-collapse-item {
     border-bottom: 0!important;
 }
 .site-collapse-custom-panel .ant-collapse-arrow{
     margin-right: 0!important;
 }
 
-
+.form-data .custom-codemirror{
+ height: 106px;
+}
 

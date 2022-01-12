@@ -47,21 +47,46 @@
 
 .custom_method_input .ant-form-item-control-input {
     display: flex;
-    width: 100%;
+    width: 60%;
 }
 .custom_method_input .ant-form-item-control-input .ant-form-item-control-input-content{
     display: flex;
     align-items: center;
 }
+.custom_box{
+    position: relative;
+}
 .custom_submit{
+    position: absolute!important;
+    top: 0;
+    left: 441px;
     width: 120px!important;
     height: 44px!important;
     margin-right: 0!important;
+    background-color: #7a96f5!important;
+    border: 0!important;
+    color: #ffffff;
+}
+.custom_submit:hover{
+    background-color: #384571!important;
 }
 .custom_method_input .ant-select-arrow{
     right: 30px!important;
 }
+.css-llbkce-DataDisplay{
+    min-width: 644px!important;
+}
 
-.custom_method_input .ant-select{
-    width: 70%!important;
+
+.metadata-item .ant-collapse-header{
+    justify-content: flex-end!important;
+    margin-left: 30px;
+    color: #9d9ea2!important;
+    margin-bottom: 10px;
+}
+.metadata-item .ant-collapse-header::before{
+    content: '' !important;
+}
+.metadata-item .ant-collapse-header::after{
+    content: '' !important;
 }

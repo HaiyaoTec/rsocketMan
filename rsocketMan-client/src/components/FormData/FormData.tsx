@@ -15,7 +15,7 @@ import arrow_down from './assets/drop-down-arrow.svg'
 import {Collapse} from 'antd';
 import {CaretRightOutlined} from '@ant-design/icons';
 import './css/index.css'
-
+import CustomerCodeMirror from "../CodeMirror/CodeMirror";
 const {Panel} = Collapse;
 type LayoutType = Parameters<typeof Form>[0]['layout'];
 const {TextArea} = Input
@@ -85,7 +85,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
             route: '/xxx/xxx',
             data: '',
             receive: [],
-            method: 'fireAndForget'
+            method: 'requestStream'
           }))
           navigate(`/${nanoID}`)
         }
@@ -122,6 +122,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
   return (
     <>
       <Form
+        className={"form-data"}
         form={form}
         {...formItemLayout}
         layout={'horizontal'}
@@ -151,7 +152,8 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           </Select>
         </Form.Item>
         <Form.Item name={"metadata"} label="SetUp Metadata">
-          <TextArea/>
+          {/*<TextArea css={css`min-height: 120px!important;`}/>*/}
+          <CustomerCodeMirror formRef={form} field={"metadata"}/>
         </Form.Item>
 
         <Form.Item
@@ -166,7 +168,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           </Select>
         </Form.Item>
         <Form.Item name={"data"} label="SetUp Payload">
-          <TextArea/>
+          <CustomerCodeMirror formRef={form} field={"data"}/>
         </Form.Item>
         <Collapse
           bordered={false}
