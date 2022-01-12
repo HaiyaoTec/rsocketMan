@@ -78,7 +78,7 @@ const SideBarItem: FC<prosType> = ({info}) => {
             color: #FFFFFF54;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;`}>{`${info.receive![0]?.data??''}`}</span>
+            white-space: nowrap;`}>{info.receive![0]?.data==='{}'?<span css={css`color: #FFFFFF54`}>Empty</span>:info.receive![0]?.data}</span>
           <span css={
             css
               ` color: #7699FC;
@@ -89,7 +89,7 @@ const SideBarItem: FC<prosType> = ({info}) => {
             e.preventDefault()
             e.stopPropagation()
             const nanoID = nanoid()
-            store.dispatch(addRequestItem({...info, id: nanoID, receive: []}))
+            store.dispatch(addRequestItem({...info, id: nanoID, receive: [],metadata:'',data:''}))
             navigate(nanoID)
           }}>COPY</span>
         </div>

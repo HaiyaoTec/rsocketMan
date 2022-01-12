@@ -10,7 +10,8 @@ import {
   encodeSimpleAuthMetadata,
   MESSAGE_RSOCKET_COMPOSITE_METADATA,
   BufferEncoders,
-  RSocketResumableTransport
+  RSocketResumableTransport, CompositeMetadata,
+  decodeCompositeMetadata
 } from 'rsocket-core';
 import RSocketWebsocketClient from 'rsocket-websocket-client';
 import {Flowable} from 'rsocket-flowable';
@@ -32,8 +33,12 @@ export const transformData = (data: unknown, type: type) => {
     case 'application/json':
       console.log('jsonParse')
       if (!data) data = '{}'
-      data = JSON.stringify(JSON.parse(data as string))
       console.log(data)
+      try {
+        data = JSON.stringify(JSON.parse(data as string))
+      }catch (e) {
+        // @ts-ignore
+      }
       break;
     case 'text/plain':
       if (!data) data = ''
@@ -57,8 +62,12 @@ export const transformMetaData = (data: unknown, type: type, route = '') => {
       if (!data) {
         data = "{}"
       }
+      try {
+        data=JSON.stringify(JSON.parse(data as string))
+      }catch (e) {
+      }
       return encodeCompositeMetadata([
-        [APPLICATION_JSON, Buffer.from(JSON.stringify(JSON.parse(data as string)))],
+        [APPLICATION_JSON, Buffer.from(data as string)],
         [MESSAGE_RSOCKET_ROUTING, encodeRoute(route)]
       ]);
     case 'text/plain':
@@ -217,6 +226,7 @@ export const fireAndForget = (value: { id: string, method: string, route?: strin
     message.error('rsocket instance not init yet');
   } else {
     rsocket.fireAndForget(payLoad as Payload<any, any>)
+    sendMessageAndUpdateUI(value,payLoad)
   }
 }
 
@@ -257,6 +267,8 @@ export const requestResponse = (value: { id: string, method: string, route?: str
           _cancel = cancel
         },
       });
+    //添加消息流
+    sendMessageAndUpdateUI(value,payLoad)
   }
 }
 
@@ -302,6 +314,8 @@ export const requestStream = (value: { id: string, method: string, route?: strin
           request(nums);
         },
       })
+    //添加消息流
+    sendMessageAndUpdateUI(value,payLoad)
   }
 }
 
@@ -347,20 +361,37 @@ export const requestChannel = (value: { id: string, method: string, route?: stri
           request(nums);
         },
       })
+    //添加消息流
+    sendMessageAndUpdateUI(value,payLoad)
   }
 }
 
+export const sendMessageAndUpdateUI=(value: { id: string; method: string; route?: string | undefined; metadata?: string | undefined; data?: string | undefined; }, payLoad:any)=>{
+  const decodeMetadata= decodeCompositeMetadata(
+    payLoad.metadata as Buffer
+  )
+  let metadata
+  //@ts-ignore
+  for(let {_content,_type} of decodeMetadata){
+    if(_type.toString()==='application/json'){
+      metadata=_content.toString()
+    }
+  }
+  //添加消息流
+  receiveAndUpdateUI(value,Object.assign({data:payLoad.data.toString(),metadata:metadata},{isSend:true,success:true}))
+}
 
-export const receiveAndUpdateUI = (value: { id: string, method: string, route?: string, metadata?: string, data?: string }, response: any, _cancel: Function) => {
+
+export const receiveAndUpdateUI = (value: { id: string, method: string, route?: string, metadata?: string, data?: string }, response: any, _cancel?: Function) => {
   const currentItem = store.getState().requestSliceReducer.find((item) => value.id === item.id)
   let receive = currentItem?.receive as Array<any>
-  response = Object.assign({date: new Date().toLocaleTimeString('chinese', {hour12: false})}, response)
+  response = Object.assign({date: new Date().toLocaleTimeString('chinese', {hour12: false}),isSend:false}, response)
   //新增消息
   receive = receive.length === 0 ? [...receive, response] : [response, ...receive]
   console.log({...value, receive})
   //如果当前currentItem切换了方法，则中断之前的请求
   if (currentItem?.method !== value.method) {
-    _cancel()
+    _cancel&&_cancel()
     return
   }
   store.dispatch(updateRequestItem({...value, receive}))

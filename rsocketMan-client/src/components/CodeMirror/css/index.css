@@ -1,0 +1,17 @@
+
+.custom-codemirror{
+height: 210px;
+}
+.custom-codemirror .cm-editor{
+    background-color: #1f2128!important;
+
+}
+.custom-codemirror .cm-activeLine{
+    background-color: #1f2128!important;
+}
+.custom-codemirror .cm-gutters{
+    background-color: #1f2128!important;
+}
+.custom-codemirror .cm-gutterElement{
+    background-color: #1f2128!important;
+}

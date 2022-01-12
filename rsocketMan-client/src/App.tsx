@@ -44,7 +44,7 @@ function App() {
                   display: none
                 }
 
-                background-color: #272b30;
+                background-color: #252730;
                 min-width: 336px !important;
                 padding: 0 !important;
               `
