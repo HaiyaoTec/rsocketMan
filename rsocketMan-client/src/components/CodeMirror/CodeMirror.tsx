@@ -5,11 +5,12 @@ import { useRequest } from 'ahooks';
 import './css/index.css'
 type props={
   formRef:FormInstance,
-  field:string
+  field:string,
+  initValue?:string
 }
 
 
-export default function CustomerCodeMirror({formRef,field}:props) {
+export default function CustomerCodeMirror({formRef,field,initValue}:props) {
   const resetFieldsValue=(value:string)=>{
     return new Promise((resolve)=>{
       const formValues=formRef.getFieldsValue()
@@ -25,14 +26,14 @@ export default function CustomerCodeMirror({formRef,field}:props) {
   }
 
   const {run}=useRequest(resetFieldsValue,{
-    debounceWait:1000,
+    debounceWait:300,
     manual:true
   })
   return (
     <CodeMirror
       className={"custom-codemirror"}
       theme={"dark"}
-      value=""
+      value={initValue}
       height="100px"
       extensions={[json()]}
       onChange={(value, viewUpdate) => {

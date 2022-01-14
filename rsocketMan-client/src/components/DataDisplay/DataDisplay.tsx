@@ -7,9 +7,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {configure} from "../../store/slice/ConnectionSlice";
 import {fireAndForget, sendMessageByMethod, transformData} from "../../utils";
 import {nanoid} from "nanoid";
-import {Routes, Route, useParams} from "react-router-dom";
+import {Routes, Route, useParams, useNavigate} from "react-router-dom";
 import {store} from "../../store/store";
-import {updateRequestItem} from "../../store/slice/RequestSlice";
+import {addRequestItem, updateRequestItem} from "../../store/slice/RequestSlice";
 import './css/index.css'
 import prettier from 'prettier'
 //@ts-ignore
@@ -42,11 +42,14 @@ const formItemLayout = {
 const DataDisplay: FC = () => {
   console.log("render");
   const params = useParams();
+  const navigate = useNavigate()
+  const [isFirstSend,setIsFirstSend]=useState(true)
   const {metadataMimeType, dataMimeType} = useSelector(
     (state) => state.connection
   );
   const [dataItem, setDataItem] = useState(null);
-  const id = params.requestID;
+
+  const id = params.requestID as string;
   // const dataDisplayData = useSelector((state) => state.dataDisplayReducer)
   //                         useSelector((state)=>state.requestSliceReducer)
   let currentRequest = useSelector((state) =>
@@ -77,18 +80,29 @@ const DataDisplay: FC = () => {
   // }
   console.log(currentRequest);
 
-  const onFinish = (value: any) => {
+  const onFinish = (value: {data:string,metadata:string,method:string,route:string}) => {
+    console.log(value)
     console.log(metadataMimeType, dataMimeType);
     //绑定id
     // value.id = id
     //更新RequestItem
-    //切换了请求方法
-    if (value.method !== currentRequest?.method) {
-      store.dispatch(updateRequestItem({...value, id, receive: []}));
+    //不是第一次发送,新建新的通道
+    if (!isFirstSend) {
+      //创建新的id
+      const newId=nanoid()
+      store.dispatch(addRequestItem({
+        ...value,
+        id: `${newId}`,
+        receive: []
+      }))
+      sendMessageByMethod({...value, id:`${newId}`});
+      //跳转路由
+      navigate(`/${newId}`)
     } else {
       store.dispatch(updateRequestItem({...value, id}));
+      sendMessageByMethod({...value, id});
+      setIsFirstSend(false)
     }
-    sendMessageByMethod({...value, id});
     message.success('message send ')
   };
 
@@ -202,13 +216,13 @@ const DataDisplay: FC = () => {
                     <Form.Item name={"metadata"} label="" css={css`font-weight: bold;
                       margin-left: 120px;
                       width: 638px`}>
-                      <CustomerCodeMirror formRef={form} field={"metadata"}/>
+                      <CustomerCodeMirror formRef={form} field={"metadata"} initValue={initialValues.metadata}/>
                     </Form.Item>
                   </Panel>
                 </Collapse>
 
                 <Form.Item name={"data"} label="Payload" css={css`font-weight: bold;`}>
-                  <CustomerCodeMirror formRef={form} field={"data"}/>
+                  <CustomerCodeMirror formRef={form} field={"data"} initValue={initialValues.data}/>
                 </Form.Item>
               </Form>
             </div>

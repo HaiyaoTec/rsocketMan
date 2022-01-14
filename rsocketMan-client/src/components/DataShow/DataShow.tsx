@@ -30,10 +30,11 @@ const formatData = (data: string) => {
 }
 
 const getFormatData=(data:string)=>{
+  console.log(data,typeof data)
   try {
-    const jsonObj=JSON.parse(data)
-    if( typeof jsonObj ==='string'){
-      return formatData(jsonObj)
+    let jsonObj=JSON.parse(data)
+    if((typeof jsonObj ==='string')||(typeof jsonObj ==='number')){
+      return formatData(jsonObj as string)
     }
   return (<ReactJson theme={"ashes"} src={jsonObj}/>)
   }catch (e){
