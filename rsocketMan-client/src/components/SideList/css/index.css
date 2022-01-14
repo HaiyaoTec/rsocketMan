@@ -1,18 +1,18 @@
-.remove-btn {
-    margin-right: 0.5rem;
-}
+
 
 .item-enter {
+    transform: translateX(-600px);
     opacity: 0;
 }
 .item-enter-active {
+    transform: translateX(0px);
     opacity: 1;
-    transition: opacity 500ms ease-in;
+    transition: all 600ms ease-in;
 }
 .item-exit {
     opacity: 1;
 }
 .item-exit-active {
     opacity: 0;
-    transition: opacity 500ms ease-in;
+    transition: opacity 500ms linear;
 }

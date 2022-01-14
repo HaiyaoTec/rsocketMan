@@ -12,34 +12,33 @@ import {
   TransitionGroup,
 } from 'react-transition-group';
 
-type props={
-  requestItems:RequestSliceItem[]
+type props = {
+  requestItems: RequestSliceItem[]
 }
-const SideList=({requestItems}:props)=>{
-
+const SideList = ({requestItems}: props) => {
   return (
     <Sider
       css={
         css`
-                border: 1px solid #000000;
-                overflow: auto;
+          border: 1px solid #000000;
+          overflow: auto;
 
-                &::-webkit-scrollbar {
-                  display: none
-                }
+          &::-webkit-scrollbar {
+            display: none
+          }
 
-                background-color: #252730;
-                min-width: 336px !important;
-                padding: 0 !important;
-              `
+          background-color: #252730;
+          min-width: 336px !important;
+          padding: 0 !important;
+        `
       }
     >
       <div css={css`
-              position: sticky;
-              top: 0;
-              height: 44px;
-              margin: 20px 20px 20px 20px;
-            `
+        position: sticky;
+        top: 0;
+        height: 44px;
+        margin: 20px 20px 20px 20px;
+      `
       }
            onClick={() => {
              store.dispatch(addRequestItem({
@@ -54,33 +53,34 @@ const SideList=({requestItems}:props)=>{
       >
         <div css={
           css`
-                  height: 44px;
-                  text-align: center;
-                  line-height: 44px;
-                  font-family: Poppins, serif;
-                  font-style: normal;
-                  font-weight: 600;
-                  color: #FFFFFF;
-                  cursor: pointer;
-                  background-color: #7297FC;
-                  border-radius: 3px;
-                `}>
+            height: 44px;
+            text-align: center;
+            line-height: 44px;
+            font-family: Poppins, serif;
+            font-style: normal;
+            font-weight: 600;
+            color: #FFFFFF;
+            cursor: pointer;
+            background-color: #7297FC;
+            border-radius: 3px;
+          `}>
           + Add Request
         </div>
       </div>
       {/*SideBar*/}
       <TransitionGroup>
-      {
-        requestItems.map((item, index) => (
-          <CSSTransition
-            key={item.id}
-            timeout={500}
-            classNames="item"
-          >
-        <SideBarItem key={item.id} info={item}/>
-          </CSSTransition>
-      ))
-      }
+        {
+          requestItems.map((item, index) => (
+            <CSSTransition
+              key={item.id}
+              timeout={1000}
+              classNames={"item"}
+              unmountOnExit
+            >
+              <SideBarItem key={item.id} info={item}/>
+            </CSSTransition>
+          ))
+        }
       </TransitionGroup>
     </Sider>
   )
