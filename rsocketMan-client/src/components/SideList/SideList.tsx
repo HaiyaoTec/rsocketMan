@@ -4,18 +4,20 @@ import {store} from "../../store/store";
 import {addRequestItem, RequestSliceItem} from "../../store/slice/RequestSlice";
 import {nanoid} from "nanoid";
 import SideBarItem from "../SideBarItem/SideBarItem";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Sider from "antd/es/layout/Sider";
 import './css/index.css'
-import {
-  CSSTransition,
-  TransitionGroup,
-} from 'react-transition-group';
+import {CSSTransition, TransitionGroup,} from 'react-transition-group';
+import {useLocation, useParams} from "react-router-dom";
 
 type props = {
   requestItems: RequestSliceItem[]
 }
 const SideList = ({requestItems}: props) => {
+  let { pathname } = useLocation();
+  pathname=pathname.slice(1)
+  console.log(pathname)
+  const [current,setCurrent]=useState('')
   return (
     <Sider
       css={
@@ -47,7 +49,7 @@ const SideList = ({requestItems}: props) => {
                route: '/xxx/xxx',
                data: '',
                receive: [],
-               method: 'fireAndForget'
+               method: 'requestStream'
              }))
            }}
       >
@@ -77,7 +79,10 @@ const SideList = ({requestItems}: props) => {
               classNames={"item"}
               unmountOnExit
             >
-              <SideBarItem key={item.id} info={item}/>
+              <div
+                key={item.id}>
+              <SideBarItem path={pathname} info={item}/>
+              </div>
             </CSSTransition>
           ))
         }

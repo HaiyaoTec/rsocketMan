@@ -56,7 +56,6 @@ const DataDisplay: FC = () => {
   const receiveItems = currentRequest?.receive;
 
   useEffect(() => {
-    console.log(id);
     form.setFieldsValue(initialValues);
     setDataItem(null)
     //如果recevie长度为0，那么表示还未发送过消息

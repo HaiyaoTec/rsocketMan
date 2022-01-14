@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import {css, jsx} from '@emotion/react'
-import React, {FC, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import {Form, Input, Button, Radio, Select, message} from 'antd';
 import {FormInstance} from "antd/es";
 import {useDispatch, useSelector} from 'react-redux'
@@ -14,12 +14,16 @@ import './css/index.css'
 
 type prosType = {
   info: RequestSliceItem
+  path:string
 }
-const SideBarItem: FC<prosType> = ({info}) => {
+const SideBarItem: FC<prosType> = ({info,path}) => {
+console.log(path)
   const dispatch = useDispatch()
+  const [current,setCurrent]=useState('')
   let navigate = useNavigate()
   return (
     <div
+      className={info.id===path?'current':''}
       css={css`& > :hover {
       background-color: #384571
     }`}>
