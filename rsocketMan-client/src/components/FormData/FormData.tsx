@@ -38,7 +38,7 @@ const initialValues = {
   lifetime: 1000000,
   dataMimeType: 'application/json',
   metadataMimeType: 'application/json',
-  useResume: false,
+  useResume: true,
   sessionDuration: 6000,
   token: `${nanoid()}`
 }
