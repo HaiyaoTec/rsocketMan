@@ -59,7 +59,10 @@ const DataDisplay: FC = () => {
     console.log(id);
     form.setFieldsValue(initialValues);
     setDataItem(null)
-    setIsFirstSend(true)
+    //如果recevie长度为0，那么表示还未发送过消息
+    if(!currentRequest?.receive?.length){
+      setIsFirstSend(true)
+    }
   }, [currentRequest?.method, currentRequest?.id]);
 
   let initialValues = {
