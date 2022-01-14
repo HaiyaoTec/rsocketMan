@@ -1,11 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import {css, jsx} from "@emotion/react";
-import React, {FC, useEffect, useRef, useState} from "react";
-import {Form, Input, Button, Radio, Select, message} from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import {useDispatch, useSelector} from "react-redux";
-import {configure} from "../../store/slice/ConnectionSlice";
-import {fireAndForget, sendMessageByMethod, transformData} from "../../utils";
+import React, {FC, useEffect, useState} from "react";
+import {Form, Input, Button, Select, message} from "antd";
+import { useSelector} from "react-redux";
+import {sendMessageByMethod} from "../../utils";
 import {nanoid} from "nanoid";
 import {Routes, Route, useParams, useNavigate} from "react-router-dom";
 import {store} from "../../store/store";
@@ -15,7 +13,6 @@ import prettier from 'prettier'
 //@ts-ignore
 import parserBabel from "prettier/esm/parser-babel.mjs";
 import arrow_down from "../FormData/assets/drop-down-arrow.svg";
-import {CaretRightOutlined} from '@ant-design/icons';
 import {Collapse} from 'antd';
 import MessageItem from "../MessageItem/MessageItem";
 import DataShow from '../DataShow/DataShow'
@@ -23,10 +20,8 @@ import CustomerCodeMirror from "../CodeMirror/CodeMirror";
 
 const {Panel} = Collapse;
 
-
 type LayoutType = Parameters<typeof Form>[0]["layout"];
 const {Option} = Select;
-
 const formItemLayout = {
   labelCol: {
     xs: {span: 5},
@@ -64,6 +59,7 @@ const DataDisplay: FC = () => {
     console.log(id);
     form.setFieldsValue(initialValues);
     setDataItem(null)
+    setIsFirstSend(true)
   }, [currentRequest?.method, currentRequest?.id]);
 
   let initialValues = {

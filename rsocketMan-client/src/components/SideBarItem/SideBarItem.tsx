@@ -9,6 +9,7 @@ import {configure, updateRScoketInstance} from "../../store/slice/ConnectionSlic
 import {addRequestItem, RequestSliceItem} from "../../store/slice/RequestSlice";
 import {store} from "../../store/store";
 import {nanoid} from "nanoid";
+import './css/index.css'
 
 
 type prosType = {
@@ -18,7 +19,8 @@ const SideBarItem: FC<prosType> = ({info}) => {
   const dispatch = useDispatch()
   let navigate = useNavigate()
   return (
-    <div css={css`& > :hover {
+    <div
+      css={css`& > :hover {
       background-color: #384571
     }`}>
       <div
