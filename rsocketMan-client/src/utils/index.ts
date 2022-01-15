@@ -187,6 +187,24 @@ export function createResumeRSocketClient() {
         data: (transformData(configuration?.data, configuration.dataMimeType) ?? "")
       }
     };
+    let start = true;
+    // resumableTransport.connectionStatus().subscribe({
+    //   onNext: status => {
+    //     console.log('Resumable transport status changed: ' + status.kind);
+    //
+    //     if (status.kind === 'NOT_CONNECTED') {
+    //       if (!start) {
+    //         console.log('Resumable transport disconnected, retrying...');
+    //         setTimeout(() => resumableTransport.connect(), reconnectIntervalMillis);
+    //       } else {
+    //         start = false;
+    //       }
+    //     }
+    //   },
+    //   onSubscribe: subscription => {
+    //     subscription.request(Number.MAX_SAFE_INTEGER);
+    //   },
+    // })
 
     // @ts-ignore
     const client = new RSocketClient({setup: setupOptions, transport: resumableTransport});

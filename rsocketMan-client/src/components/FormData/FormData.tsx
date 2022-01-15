@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import {css, jsx} from '@emotion/react'
 import React, {FC, useRef, useState} from "react";
-import {Form, Input, Button, Radio, Select, message, Switch, Checkbox} from 'antd';
+import {Form, Input, Button, Radio, Select, message, Switch, Checkbox, Spin} from 'antd';
 import {FormInstance} from "antd/es";
 import {useDispatch, useSelector} from 'react-redux'
 import {configure, updateRScoketInstance} from "../../store/slice/ConnectionSlice";
@@ -48,6 +48,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
 
   const [form] = useForm()
   const [num, setNum] = useState(0)
+  const [isSpin,setSpin]=useState(false)
   const navigate = useNavigate();
   const configuration = useSelector((state) => {
     return state
@@ -59,8 +60,8 @@ const FormData: FC = ({setIsModalVisible}: any) => {
   })
 
   const disPatch = useDispatch()
-
   const onFinish = (values: any) => {
+    setSpin(true)
     // setIsModalVisible(false)
     console.log('Received values of form: ', values);
     form.validateFields()
@@ -94,10 +95,14 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         console.error(err);
         message.error(err)
       })
+      .finally(()=>{
+        setSpin(false)
+      })
   };
 
 
   const onTest = () => {
+    setSpin(true)
     // console.log(form.getFieldsValue())
     form.validateFields()
       .then(async result => {
@@ -116,13 +121,16 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         message.error('connection fail')
         console.error(err);
       })
+      .finally(()=>{
+        setSpin(false)
+      })
   }
 
   // disPatch(configure(configuration))
   return (
-    <>
+    <div  className={"form-data"}>
+      <Spin delay={1000} tip={"Connecting..."} size="large" spinning={isSpin} />
       <Form
-        className={"form-data"}
         form={form}
         {...formItemLayout}
         layout={'horizontal'}
@@ -246,7 +254,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           </Form.Item>
         </footer>
       </Form>
-    </>
+    </div>
   );
 }
 export default FormData

@@ -35,3 +35,11 @@ background-color: #252730;
  height: 106px;
 }
 
+.form-data .ant-spin-spinning{
+    position: fixed;
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    font-weight: bold;
+}
