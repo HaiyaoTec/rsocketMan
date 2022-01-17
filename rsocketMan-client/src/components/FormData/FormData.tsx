@@ -4,7 +4,7 @@ import React, {FC, useRef, useState} from "react";
 import {Form, Input, Button, Radio, Select, message, Switch, Checkbox, Spin} from 'antd';
 import {FormInstance} from "antd/es";
 import {useDispatch, useSelector} from 'react-redux'
-import {configure, updateRScoketInstance} from "../../store/slice/ConnectionSlice";
+import {configure, Connection, updateRScoketInstance} from "../../store/slice/ConnectionSlice";
 import {createResumeRSocketClient, createRSocketClient} from "../../utils";
 import {useForm} from "antd/es/form/Form";
 import {nanoid} from "nanoid";
@@ -32,20 +32,38 @@ const formItemLayout = {
 };
 
 
-const initialValues = {
-  websocketURL: 'ws://127.0.0.1:10081',
-  KeepAlive: 1000000,
-  lifetime: 1000000,
-  dataMimeType: 'application/json',
-  metadataMimeType: 'application/json',
-  useResume: true,
-  sessionDuration: 6000,
-  token: `${nanoid()}`
-}
+
 
 
 const FormData: FC = ({setIsModalVisible}: any) => {
-
+  // useSelector((state)=>{
+  //   return state
+  // })
+  const connection=store.getState().connection
+  // type initialValues= Omit<Connection,"rsocket"|"status"|"error">
+  //从持久化恢复，并初始化
+  const initialValues = {
+    websocketURL:connection.websocketURL?connection.websocketURL:'ws://127.0.0.1:10081',
+    KeepAlive: connection.KeepAlive?connection.KeepAlive:1000000,
+    lifetime: connection.lifetime?connection.lifetime:1000000,
+    dataMimeType: connection.dataMimeType?connection.dataMimeType:'application/json',
+    data:connection.data?connection.data:'',
+    metadataMimeType: connection.metadataMimeType?connection.metadataMimeType:'application/json',
+    metadata:connection.metadata?connection.metadata:'',
+    useResume:connection.useResume,
+    sessionDuration: connection.sessionDuration?connection.sessionDuration:6000,
+    token: `${nanoid()}`
+  }
+  // const initialValues = {
+  //   websocketURL: 'ws://127.0.0.1:10081',
+  //   KeepAlive: 1000000,
+  //   lifetime: 1000000,
+  //   dataMimeType: 'application/json',
+  //   metadataMimeType: 'application/json',
+  //   useResume: true,
+  //   sessionDuration: 6000,
+  //   token: `${nanoid()}`
+  // }
   const [form] = useForm()
   const [num, setNum] = useState(0)
   const [isSpin,setSpin]=useState(false)
@@ -129,7 +147,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
   // disPatch(configure(configuration))
   return (
     <div  className={"form-data"}>
-      <Spin delay={1000} tip={"Connecting..."} size="large" spinning={isSpin} />
+      <Spin delay={300} tip={"Connecting..."} size="large" spinning={isSpin} />
       <Form
         form={form}
         {...formItemLayout}
@@ -161,7 +179,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         </Form.Item>
         <Form.Item name={"metadata"} label="SetUp Metadata">
           {/*<TextArea css={css`min-height: 120px!important;`}/>*/}
-          <CustomerCodeMirror formRef={form} field={"metadata"}/>
+          <CustomerCodeMirror initValue={initialValues.metadata} formRef={form} field={"metadata"}/>
         </Form.Item>
 
         <Form.Item
@@ -176,7 +194,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           </Select>
         </Form.Item>
         <Form.Item name={"data"} label="SetUp Payload">
-          <CustomerCodeMirror formRef={form} field={"data"}/>
+          <CustomerCodeMirror initValue={initialValues.data} formRef={form} field={"data"}/>
         </Form.Item>
         <Collapse
           bordered={false}

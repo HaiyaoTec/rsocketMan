@@ -15,6 +15,7 @@ export interface Connection {
   //resume need
   sessionDuration?:number
   token?:string
+  useResume:boolean
 }
 
 const initialState: Connection = {
@@ -28,7 +29,8 @@ const initialState: Connection = {
   metadataMimeType: "",
   //resume need
   sessionDuration:0,
-  token:''
+  token:'',
+  useResume:true
 }
 
 
