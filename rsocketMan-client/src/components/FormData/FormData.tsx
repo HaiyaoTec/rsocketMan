@@ -111,7 +111,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
       )
       .catch(err => {
         console.error(err);
-        message.error(err)
+        message.error('error! check console')
       })
       .finally(()=>{
         setSpin(false)
@@ -136,7 +136,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
         }
       )
       .catch(err => {
-        message.error('connection fail')
+        message.error('error! check console')
         console.error(err);
       })
       .finally(()=>{

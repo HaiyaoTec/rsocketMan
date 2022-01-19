@@ -250,8 +250,6 @@ export function createResumeRSocketClient() {
       onSubscribe: (cancel) => {
       },
       onComplete: (client) => {
-        //TODO 需要修改
-        //为了处理completed在errorHandler之前先执行的bug
         setTimeout(() => {
           console.log('连接成功')
           if (!isError) {
@@ -318,7 +316,7 @@ export const requestResponse = (value: { id: string, method: string, route?: str
           receiveAndUpdateUI(value, response, _cancel)
         },
         onError: (error) => {
-          //TODO 添加错误消息
+            //TODO 添加错误消息
           console.log(error);
           //将buffer转换为string
           let response = {success: false, data: `${error}`, metadata: ''}
