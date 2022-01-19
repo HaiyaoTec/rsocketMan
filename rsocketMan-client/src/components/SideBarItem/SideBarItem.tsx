@@ -62,7 +62,7 @@ console.log(path)
             text-align: center;
             line-height: 24px;
             font-weight: bold;
-            background-color: ${info.receive?.some(item=>item.success===false)?'#eb8a93':'#60be51'};
+            background-color: ${info?.receive?.some(item=>item.success===false)?'#eb8a93':'#60be51'};
             color: #FFFFFF;
             border-radius: 50%`}>{info.receive!.length}</span>
         </div>
