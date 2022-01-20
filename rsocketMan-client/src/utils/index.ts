@@ -32,7 +32,10 @@ export const transformData = (data: unknown, type: type) => {
   switch (type) {
     case 'application/json':
       console.log('jsonParse')
-      if (!data) data = '{}'
+      if(!data){
+        return Buffer.from('')
+      }
+      // if (!data) data = '{}'
       console.log(data)
       try {
         data = JSON.stringify(JSON.parse(data as string))
@@ -60,7 +63,7 @@ export const transformMetaData = (data: unknown, type: type, route = '') => {
   switch (type) {
     case 'application/json':
       if (!data) {
-        data = "{}"
+        return Buffer.from('')
       }
       try {
         data = JSON.stringify(JSON.parse(data as string))
