@@ -18,7 +18,7 @@ import {Flowable} from 'rsocket-flowable';
 import {ISubscription} from "rsocket-types/ReactiveStreamTypes";
 import {store} from "../store/store";
 import {useSelector} from "react-redux";
-import {Payload} from "rsocket-types";
+import {Payload, ReactiveSocket} from "rsocket-types";
 import {updateRequestItem} from "../store/slice/RequestSlice";
 import {Buffer} from "buffer";
 import * as buffer from "buffer";
@@ -90,7 +90,7 @@ export const transformMetaData = (data: unknown, type: type, route = '') => {
  * 创建 rsocket client instance的方法
  * @param options
  */
-export async function createRSocketClient() {
+export async function createRSocketClient():Promise< ReactiveSocket<Buffer, Buffer>> {
 
   return new Promise((resolve, reject) => {
     //获取配置信息
@@ -173,7 +173,7 @@ export async function createRSocketClient() {
  * 创建 ResumeRsocket client instance的方法
  * @param options
  */
-export function createResumeRSocketClient() {
+export function createResumeRSocketClient():Promise< ReactiveSocket<Buffer, Buffer>> {
 
   return new Promise((resolve, reject) => {
     //获取配置信息
