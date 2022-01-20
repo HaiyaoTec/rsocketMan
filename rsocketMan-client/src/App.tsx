@@ -41,7 +41,7 @@ function App() {
             border-radius: 3px;
             overflow: auto`}>
             <Routes>
-              <Route path=":requestID" element={<DataDisplay/>}/>
+              <Route path="/:requestID" element={<DataDisplay/>}/>
             </Routes>
           </Content>
         </Layout>
