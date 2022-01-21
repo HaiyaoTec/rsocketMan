@@ -104,6 +104,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
             route: '',
             data: '',
             receive: [],
+            isFirstSend:true,
             method: 'requestStream'
           }))
           navigate(`/${nanoID}`)
