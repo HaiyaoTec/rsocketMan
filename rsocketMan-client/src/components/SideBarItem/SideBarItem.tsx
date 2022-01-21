@@ -32,7 +32,7 @@ console.log(path)
           css`
             width: 100%;
             background-color: #252730;
-            padding: 20px;
+            padding: 14px;
             border: 1px solid #000000;
             border-left: 0;
             border-right: 0;
@@ -55,16 +55,17 @@ console.log(path)
             font-style: normal;
             font-weight: 600;
             color: #7699FC;
-          `}>{info.method}</span>
+          `}>{info.method.replace(/^\S/, s => s.toUpperCase())}</span>
           <span css={css`
             width: 24px;
             height: 24px;
+            font-size: 8px;
             text-align: center;
             line-height: 24px;
             font-weight: bold;
             background-color: ${info?.receive?.some(item=>item.success===false)?'#eb8a93':'#60be51'};
             color: #FFFFFF;
-            border-radius: 50%`}>{info.receive!.length}</span>
+            border-radius: 50%`}>{info.receive!.length<999?info.receive!.length:9+'...'}</span>
         </div>
         {/*  route*/}
         <div css={css`
@@ -76,7 +77,7 @@ console.log(path)
         </div>
         {/*  data*/}
         <div css={css`padding: 10px 0;
-          font-size: 20px;
+          font-size: 12px;
           display: flex;
           justify-content: space-between`}>
           <span css={css`max-width: 70%;
@@ -84,12 +85,13 @@ console.log(path)
             color: #FFFFFF54;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;`}>{info.receive![0]?.data==='{}'?<span css={css`color: #FFFFFF54`}>Empty</span>:info.receive![0]?.data}</span>
+            white-space: nowrap;`}>{info.receive![0]?.data===''?<span css={css`color: #FFFFFF54`}>Empty</span>:info.receive![0]?.data}</span>
           <span css={
             css
               ` color: #7699FC;
                 font-weight: bold;
                 cursor: pointer;
+                font-size: 14px;
               `
           } onClick={(e) => {
             e.preventDefault()

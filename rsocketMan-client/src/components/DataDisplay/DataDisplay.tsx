@@ -177,10 +177,10 @@ const DataDisplay: FC = () => {
                   >
                     <Select suffixIcon={<img css={css`width: 12px`} src={arrow_down}/>}
                             placeholder="Please select method">
-                      <Option value="fireAndForget">fireAndForget</Option>
-                      <Option value="requestResponse">requestResponse</Option>
-                      <Option value="requestStream">requestStream</Option>
-                      <Option value="requestChannel">requestChannel</Option>
+                      <Option value="fireAndForget">RequestFNF</Option>
+                      <Option value="requestResponse">RequestAndResponse</Option>
+                      <Option value="requestStream">RequestStream</Option>
+                      <Option value="requestChannel">RequestChannel</Option>
                     </Select>
                   </Form.Item>
                   <Button
