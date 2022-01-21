@@ -34,7 +34,7 @@ export default function CustomerCodeMirror({formRef,field,initValue}:props) {
       className={"custom-codemirror"}
       theme={"dark"}
       value={initValue}
-      height="100px"
+      height={"100%"}
       extensions={[json()]}
       onChange={(value, viewUpdate) => {
         run(value)
