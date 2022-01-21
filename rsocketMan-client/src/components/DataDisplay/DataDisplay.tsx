@@ -38,7 +38,6 @@ const DataDisplay: FC = () => {
   console.log("render");
   const params = useParams();
   const navigate = useNavigate()
-  const [isFirstSend,setIsFirstSend]=useState(true)
   const {metadataMimeType, dataMimeType} = useSelector(
     (state) => state.connection
   );
@@ -59,9 +58,6 @@ const DataDisplay: FC = () => {
     form.setFieldsValue(initialValues);
     setDataItem(null)
     //如果recevie长度为0，那么表示还未发送过消息
-    if(!currentRequest?.receive?.length){
-      setIsFirstSend(true)
-    }
   }, [currentRequest?.method, currentRequest?.id]);
 
   let initialValues = {
@@ -85,21 +81,21 @@ const DataDisplay: FC = () => {
     // value.id = id
     //更新RequestItem
     //不是第一次发送,新建新的通道
-    if (!isFirstSend) {
+    if (!currentRequest?.isFirstSend) {
       //创建新的id
       const newId=nanoid()
       store.dispatch(addRequestItem({
         ...value,
         id: `${newId}`,
-        receive: []
+        receive: [],
+        isFirstSend:false
       }))
       sendMessageByMethod({...value, id:`${newId}`});
       //跳转路由
       navigate(`/${newId}`)
     } else {
-      store.dispatch(updateRequestItem({...value, id}));
+      store.dispatch(updateRequestItem({...value, id,isFirstSend:false}));
       sendMessageByMethod({...value, id});
-      setIsFirstSend(false)
     }
     message.success('message send ')
   };
@@ -116,15 +112,8 @@ const DataDisplay: FC = () => {
   }
 
   const [form] = Form.useForm();
-  // form.setFieldsValue(initialValues)
-  // @ts-ignore
-  // @ts-ignore
-  // @ts-ignore
-  // @ts-ignore
-  // @ts-ignore
+
   return (
-    // !dataDisplayData.show?
-    //   <div>123</div>:
     <div key={currentRequest?.id}>
       {currentRequest && (
         <div
@@ -227,6 +216,7 @@ const DataDisplay: FC = () => {
             {/*  leftBottom*/}
             <div
               css={css`
+                display: flex;
                 background-color: #252730;
                 border: 1px solid #000000;
                 border-top: 0;
@@ -235,19 +225,27 @@ const DataDisplay: FC = () => {
             >
               <h2 css={
                 css`
-                  margin-left: 30px;
+                  margin-left: 46px;
                   font-weight: bold;
                   font-family: Poppins, serif;
-                  position: sticky;
-                  height: 40px;
                   line-height: 40px;
-                  top: 57px;
+                  padding-top: 57px;
+                  font-size: 16px;
                   color: #9c9ea2;
                 `}>
+                <span
+                css={css`
+                  position: sticky;
+                  top: 57px;
+                `}
+                >
                 Message
+                </span>
               </h2>
               <div css={css`display: flex;
                 flex-direction: column;
+                margin-top: 40px;
+                margin-left: 20px;
                 margin-right: 40px;
                 align-items: flex-end`}>
                 {/*@ts-ignore*/}
