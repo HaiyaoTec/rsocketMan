@@ -20,10 +20,11 @@ type Props = {
 }
 const formatData = (data: string) => {
   try {
-    return prettier.format(data, {
-      parser: "babel",
-      plugins: [parserBabel],
-    })
+    return data
+    // return prettier.format(data, {
+    //   parser: "babel",
+    //   plugins: [parserBabel],
+    // })
   } catch (e) {
     return data
   }
@@ -78,7 +79,7 @@ const DataShow: ({dataItem}: Props) => JSX.Element = ({dataItem}) => {
               `}
             >
               {/*@ts-ignore*/}
-              {dataItem?.metadata === '{}' ? '' : formatData(dataItem?.metadata)}
+              {dataItem?.metadata === '' ? '' : formatData(dataItem?.metadata)}
             </pre>
           </Panel>
 
@@ -101,8 +102,7 @@ const DataShow: ({dataItem}: Props) => JSX.Element = ({dataItem}) => {
                   {/*TODO */}
               {
                 //@ts-ignore
-                // dataItem?.data === '{}' ? '' : formatData(dataItem?.data)
-                dataItem?.data === '{}' ? '' : getFormatData(dataItem?.data)
+                dataItem?.data === '' ? '' : getFormatData(dataItem?.data)
               }
             </pre>
           </Panel>
