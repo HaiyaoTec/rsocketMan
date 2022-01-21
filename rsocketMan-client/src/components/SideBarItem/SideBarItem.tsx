@@ -95,7 +95,7 @@ console.log(path)
             e.preventDefault()
             e.stopPropagation()
             const nanoID = nanoid()
-            store.dispatch(addRequestItem({...info, id: nanoID, receive: [],metadata:'',data:''}))
+            store.dispatch(addRequestItem({...info, id: nanoID, receive: []}))
             navigate(nanoID)
           }}>COPY</span>
         </div>
