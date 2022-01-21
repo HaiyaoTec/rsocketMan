@@ -55,7 +55,7 @@ console.log(path)
             font-style: normal;
             font-weight: 600;
             color: #7699FC;
-          `}>{info.method.replace(/^\S/, s => s.toUpperCase())}</span>
+          `}>{info.method!.replace(/^\S/, s => s.toUpperCase())}</span>
           <span css={css`
             width: 24px;
             height: 24px;
@@ -97,7 +97,7 @@ console.log(path)
             e.preventDefault()
             e.stopPropagation()
             const nanoID = nanoid()
-            store.dispatch(addRequestItem({...info, id: nanoID, receive: []}))
+            store.dispatch(addRequestItem({...info, id: nanoID, receive: [],isFirstSend:true}))
             navigate(nanoID)
           }}>COPY</span>
         </div>
