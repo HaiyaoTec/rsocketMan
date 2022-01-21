@@ -23,7 +23,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  blacklist: ["requestSliceReducer"],
+  // blacklist: ["requestSliceReducer"],
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
