@@ -46,7 +46,7 @@ const SideList = ({requestItems}: props) => {
              store.dispatch(addRequestItem({
                id: `${nanoid()}`,
                metadata: '',
-               route: '/xxx/xxx',
+               route: '',
                data: '',
                receive: [],
                method: 'requestStream'

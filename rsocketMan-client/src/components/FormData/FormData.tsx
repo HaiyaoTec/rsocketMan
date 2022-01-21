@@ -101,7 +101,7 @@ const FormData: FC = ({setIsModalVisible}: any) => {
           store.dispatch(addRequestItem({
             id: `${nanoID}`,
             metadata: '',
-            route: '/xxx/xxx',
+            route: '',
             data: '',
             receive: [],
             method: 'requestStream'
