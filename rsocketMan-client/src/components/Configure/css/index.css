@@ -1,18 +1,31 @@
 .ant-modal-content{
-    background-color: #31383e!important;
+    background-color: #242731!important;
     border: 2px solid #000000!important;
     border-radius: 30px!important;
 }
 .ant-modal-header{
     border-radius: 30px!important;
     border: 0!important;
-    background-color:#31383e!important;
+    background-color:#242731!important;
 }
-.ant-modal-title{
-    color: #aaa!important;
-    font-size: 22.5px!important;
-    font-weight: 500!important;
-}
+
 .ant-modal-body{
-    border-top: 1px solid #000000;
+}
+.ant-modal{
+    width: 640px!important;
+}
+
+.ant-modal-title{
+    color: #FFFFFF!important;
+    font-family: Poppins, serif!important;
+    font-weight: bold!important;
+    font-size: 20px!important;
+    line-height: 28px!important;
+}
+.ant-select-arrow{
+    color: red!important;
+}
+
+.resumeItem .ant-form-item-control-input-content{
+    background-color: transparent!important;
 }

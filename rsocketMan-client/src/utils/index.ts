@@ -10,14 +10,15 @@ import {
   encodeSimpleAuthMetadata,
   MESSAGE_RSOCKET_COMPOSITE_METADATA,
   BufferEncoders,
-  RSocketResumableTransport
+  RSocketResumableTransport, CompositeMetadata,
+  decodeCompositeMetadata
 } from 'rsocket-core';
 import RSocketWebsocketClient from 'rsocket-websocket-client';
 import {Flowable} from 'rsocket-flowable';
 import {ISubscription} from "rsocket-types/ReactiveStreamTypes";
 import {store} from "../store/store";
 import {useSelector} from "react-redux";
-import {Payload} from "rsocket-types";
+import {Payload, ReactiveSocket} from "rsocket-types";
 import {updateRequestItem} from "../store/slice/RequestSlice";
 import {Buffer} from "buffer";
 import * as buffer from "buffer";
@@ -31,9 +32,16 @@ export const transformData = (data: unknown, type: type) => {
   switch (type) {
     case 'application/json':
       console.log('jsonParse')
-      if (!data) data = '{}'
-      data = JSON.stringify(JSON.parse(data as string))
+      if(!data){
+        return Buffer.from('')
+      }
+      // if (!data) data = '{}'
       console.log(data)
+      try {
+        data = JSON.stringify(JSON.parse(data as string))
+      } catch (e) {
+        // @ts-ignore
+      }
       break;
     case 'text/plain':
       if (!data) data = ''
@@ -55,10 +63,14 @@ export const transformMetaData = (data: unknown, type: type, route = '') => {
   switch (type) {
     case 'application/json':
       if (!data) {
-        data = "{}"
+        return Buffer.from('')
+      }
+      try {
+        data = JSON.stringify(JSON.parse(data as string))
+      } catch (e) {
       }
       return encodeCompositeMetadata([
-        [APPLICATION_JSON, Buffer.from(JSON.stringify(JSON.parse(data as string)))],
+        [APPLICATION_JSON, Buffer.from(data as string)],
         [MESSAGE_RSOCKET_ROUTING, encodeRoute(route)]
       ]);
     case 'text/plain':
@@ -78,7 +90,7 @@ export const transformMetaData = (data: unknown, type: type, route = '') => {
  * 创建 rsocket client instance的方法
  * @param options
  */
-export async function createRSocketClient() {
+export async function createRSocketClient():Promise< ReactiveSocket<Buffer, Buffer>> {
 
   return new Promise((resolve, reject) => {
     //获取配置信息
@@ -93,9 +105,16 @@ export async function createRSocketClient() {
     };
     // const route = 'page/abc'
 
-    const setupOptions = {
-      keepAlive: `${configuration.KeepAlive}`,
-      lifetime: `${configuration.lifetime}`,
+    type setupOptions={
+      payload?: Payload<Buffer, Buffer> | undefined,
+        dataMimeType: string;
+      keepAlive: number;
+      lifetime: number;
+      metadataMimeType: string;
+    };
+    const setupOptions: setupOptions= {
+      keepAlive: Number(`${configuration.KeepAlive}`),
+      lifetime:  Number(`${configuration.lifetime}`),
       dataMimeType: `${configuration.dataMimeType}`,
       // metadataMimeType: `${configuration.metadataMimeType}`
       metadataMimeType: `${MESSAGE_RSOCKET_COMPOSITE_METADATA.string}`
@@ -112,21 +131,38 @@ export async function createRSocketClient() {
     };
 
     const transport = new RSocketWebsocketClient(transportOptions, BufferEncoders);
+    let isError = false;
+    let errorTemp: Error;
     // @ts-ignore
-    const client = new RSocketClient({setup: setupOptions, transport});
+    const client = new RSocketClient({
+      setup: setupOptions,
+      transport,
+      errorHandler: (error) => {
+        isError = true
+        errorTemp = error
+      }
+    });
+
     const rsocket = client.connect()
     setTimeout(() => {
       reject('连接超时')
-    }, 3000)
+    }, 5000)
     rsocket.subscribe({
       onComplete: (client) => {
-        //TODO 需要修改
-        console.log('连接成功')
-        resolve(client)
+        setTimeout(() => {
+          console.log('连接成功')
+          if (!isError) {
+            resolve(client)
+          } else {
+            reject(errorTemp)
+          }
+        }, 500)
       },
       onError: (e) => {
         console.log(e)
         reject('连接错误')
+      },
+      onSubscribe: (cancel) => {
       }
     });
   })
@@ -137,7 +173,7 @@ export async function createRSocketClient() {
  * 创建 ResumeRsocket client instance的方法
  * @param options
  */
-export function createResumeRSocketClient() {
+export function createResumeRSocketClient():Promise< ReactiveSocket<Buffer, Buffer>> {
 
   return new Promise((resolve, reject) => {
     //获取配置信息
@@ -167,8 +203,8 @@ export function createResumeRSocketClient() {
     );
 
     const setupOptions = {
-      keepAlive: `${configuration.KeepAlive}`,
-      lifetime: `${configuration.lifetime}`,
+      keepAlive: Number(`${configuration.KeepAlive}`),
+      lifetime: Number(`${configuration.lifetime}`),
       dataMimeType: `${configuration.dataMimeType}`,
       // metadataMimeType: `${configuration.metadataMimeType}`
       metadataMimeType: `${MESSAGE_RSOCKET_COMPOSITE_METADATA.string}`
@@ -178,18 +214,53 @@ export function createResumeRSocketClient() {
         data: (transformData(configuration?.data, configuration.dataMimeType) ?? "")
       }
     };
+    let start = true;
+    let reconnectIntervalMillis = 5000
+    resumableTransport.connectionStatus().subscribe({
+      onNext: status => {
+        console.log('Resumable transport status changed: ' + status.kind);
 
+        if (status.kind === 'NOT_CONNECTED') {
+          if (!start) {
+            console.log('Resumable transport disconnected, retrying...');
+            setTimeout(() => resumableTransport.connect(), reconnectIntervalMillis);
+          } else {
+            start = false;
+          }
+        }
+      },
+      onSubscribe: subscription => {
+        // subscription.request(Number.MAX_SAFE_INTEGER);
+      },
+      onError: error => {
+        console.log(error)
+      }
+    })
+    let isError = false;
+    let errorTemp: Error;
     // @ts-ignore
-    const client = new RSocketClient({setup: setupOptions, transport: resumableTransport});
+    const client = new RSocketClient({
+      setup: setupOptions, transport: resumableTransport, errorHandler: (error) => {
+        isError = true
+        errorTemp = error
+      }
+    });
     const rsocket = client.connect()
     setTimeout(() => {
       reject('连接超时')
-    }, 3000)
+    }, 5000)
     rsocket.subscribe({
+      onSubscribe: (cancel) => {
+      },
       onComplete: (client) => {
-        //TODO 需要修改
-        console.log('连接成功')
-        resolve(client)
+        setTimeout(() => {
+          console.log('连接成功')
+          if (!isError) {
+            resolve(client)
+          } else {
+            reject(errorTemp)
+          }
+        }, 500)
       },
       onError: (e) => {
         message.error('连接错误！！！')
@@ -217,6 +288,7 @@ export const fireAndForget = (value: { id: string, method: string, route?: strin
     message.error('rsocket instance not init yet');
   } else {
     rsocket.fireAndForget(payLoad as Payload<any, any>)
+    sendMessageAndUpdateUI(value, payLoad)
   }
 }
 
@@ -247,7 +319,7 @@ export const requestResponse = (value: { id: string, method: string, route?: str
           receiveAndUpdateUI(value, response, _cancel)
         },
         onError: (error) => {
-          //TODO 添加错误消息
+            //TODO 添加错误消息
           console.log(error);
           //将buffer转换为string
           let response = {success: false, data: `${error}`, metadata: ''}
@@ -257,6 +329,8 @@ export const requestResponse = (value: { id: string, method: string, route?: str
           _cancel = cancel
         },
       });
+    //添加消息流
+    sendMessageAndUpdateUI(value, payLoad)
   }
 }
 
@@ -302,6 +376,8 @@ export const requestStream = (value: { id: string, method: string, route?: strin
           request(nums);
         },
       })
+    //添加消息流
+    sendMessageAndUpdateUI(value, payLoad)
   }
 }
 
@@ -347,20 +423,40 @@ export const requestChannel = (value: { id: string, method: string, route?: stri
           request(nums);
         },
       })
+    //添加消息流
+    sendMessageAndUpdateUI(value, payLoad)
   }
 }
 
+export const sendMessageAndUpdateUI = (value: { id: string; method: string; route?: string | undefined; metadata?: string | undefined; data?: string | undefined; }, payLoad: any) => {
+  const decodeMetadata = decodeCompositeMetadata(
+    payLoad.metadata as Buffer
+  )
+  let metadata
+  //@ts-ignore
+  for (let {_content, _type} of decodeMetadata) {
+    if (_type.toString() === 'application/json') {
+      metadata = _content.toString()
+    }
+  }
+  //添加消息流
+  receiveAndUpdateUI(value, Object.assign({data: payLoad.data.toString(), metadata: metadata}, {
+    isSend: true,
+    success: true
+  }))
+}
 
-export const receiveAndUpdateUI = (value: { id: string, method: string, route?: string, metadata?: string, data?: string }, response: any, _cancel: Function) => {
+
+export const receiveAndUpdateUI = (value: { id: string, method: string, route?: string, metadata?: string, data?: string }, response: any, _cancel?: Function) => {
   const currentItem = store.getState().requestSliceReducer.find((item) => value.id === item.id)
   let receive = currentItem?.receive as Array<any>
-  response = Object.assign({date: new Date().toLocaleTimeString('chinese', {hour12: false})}, response)
+  response = Object.assign({date: new Date().toLocaleTimeString('chinese', {hour12: false}), isSend: false}, response)
   //新增消息
   receive = receive.length === 0 ? [...receive, response] : [response, ...receive]
   console.log({...value, receive})
   //如果当前currentItem切换了方法，则中断之前的请求
   if (currentItem?.method !== value.method) {
-    _cancel()
+    _cancel && _cancel()
     return
   }
   store.dispatch(updateRequestItem({...value, receive}))

@@ -14,7 +14,8 @@ import {store} from "./store/store";
 import SideBarItem from "./components/SideBarItem/SideBarItem";
 import {addRequestItem, updateRequestItem} from "./store/slice/RequestSlice";
 import {nanoid} from 'nanoid'
-import {Route, Routes,useNavigate} from 'react-router-dom';
+import {Route, Routes, useNavigate} from 'react-router-dom';
+import SideList from "./components/SideList/SideList";
 
 const {Footer, Sider, Content} = Layout;
 
@@ -23,9 +24,6 @@ function App() {
   const navigate = useNavigate();
   const requestItems = useSelector((state) => state.requestSliceReducer)
   console.log(requestItems)
-  useEffect(() => {
-  }, [])
-
 
   // @ts-ignore
   return (
@@ -33,70 +31,17 @@ function App() {
       <Configure/>
       <Layout css={css`height: 100%;`}>
         <Header/>
-        <Layout>
-          <Sider
-            css={
-              css`
-                border: 1px solid #000000;
-                overflow: auto;
-                &::-webkit-scrollbar {
-                  display: none
-                }
-                background-color: #272b30;
-                min-width: 305px !important;
-                padding: 0 !important;
-              `
-            }
-          >
-            <div css={css`
-              position: sticky;
-              top: 0;
-              height: 50px;
-              text-align: center;
-              cursor: pointer;
-              font-weight: bold;
-              font-size: 26px;
-              vertical-align: middle;
-              background-color: #16191b;
-              color: #FFFFFF;
-              border-left: 0;
-              border-right: 0;
-            `
-            }
-                 onClick={() => {
-                   store.dispatch(addRequestItem({
-                     id: `${nanoid()}`,
-                     metadata: '',
-                     route: '/xxx/xxx',
-                     data: '',
-                     receive: [],
-                     method: 'fireAndForget'
-                   }))
-                 }}
-            >
-              <div css={css`& > svg {
-                width: 10px;
-                height: 10px;
-                background-color: red;
-              }`}>
-                <img src={add} css={css`width: 30px;
-                  margin-right: 10px`}/>
-                Add Request
-              </div>
-            </div>
-            {/*SideBar*/}
-            {requestItems.map((item, index) => (
-              <SideBarItem key={index} info={item}/>
-            ))}
-          </Sider>
+        <Layout css={css`background-color: #1c1d22`}>
+        <SideList requestItems={requestItems}/>
           <Content css={css`
-            border: 1px solid #000000;
+            margin: 30px 32px;
             border-left: 0;
             border-right: 0;
-            background-color: #272b30;
+            background-color: #1c1d22;
+            border-radius: 3px;
             overflow: auto`}>
             <Routes>
-              <Route path=":requestID" element={<DataDisplay/>}/>
+              <Route path="/:requestID" element={<DataDisplay/>}/>
             </Routes>
           </Content>
         </Layout>

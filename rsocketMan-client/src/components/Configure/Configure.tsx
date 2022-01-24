@@ -23,7 +23,7 @@ const Configure: FC = () => {
       {/*  Open Modal*/}
       {/*</Button>*/}
       <Modal
-        title="Configure connection" centered visible={isModalVisible} closeIcon onOk={handleOk}
+        title="Connect Server" centered visible={isModalVisible} closeIcon onOk={handleOk}
         maskClosable={false} keyboard={false}
         footer={null}
       >

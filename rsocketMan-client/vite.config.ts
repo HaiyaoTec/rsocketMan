@@ -6,16 +6,7 @@ export default defineConfig({
   plugins: [
     react()
   ],
-  build:{
-    minify:'terser',
-    terserOptions:{
-      compress:{
-        //生产环境时移除console
-        drop_console: true,
-        drop_debugger: true,
-      }
-    }
-  },
+  esbuild: { pure: ["console.log"], minify: true, },
   resolve: {
     alias: {
       '@/': path.resolve(__dirname, 'src/'),

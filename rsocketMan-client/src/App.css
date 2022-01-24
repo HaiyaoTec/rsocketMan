@@ -4,7 +4,17 @@ height: unset!important;
 
 /*浏览器滚动条*/
 ::-webkit-scrollbar{
-    /*width: 0!important;*/
+    width: 0!important;
 }
 
+/*隐藏input number 右侧的小箭头*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
+}
 
+@font-face {
+ font-family: Poppins;
+    src:url("./assets/font/Poppins.woff2");
+}

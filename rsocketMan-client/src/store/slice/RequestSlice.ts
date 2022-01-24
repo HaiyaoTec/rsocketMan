@@ -8,11 +8,12 @@ export type receiveItem={
 }
 export interface RequestSliceItem {
   id: string
-  method: string
+  method?: string
   route?: string
   metadata?: any
   data?: any
   receive?: receiveItem[]
+  isFirstSend?:boolean
 }
 
 const initialState: Array<RequestSliceItem> = []
@@ -33,11 +34,15 @@ export const requestSlice = createSlice({
         return item
       })
       return state
-    }
+    },
+    clearRequests: (state) => {
+      state.length=0
+      return state
+    },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const {addRequestItem, updateRequestItem} = requestSlice.actions
+export const {addRequestItem, updateRequestItem,clearRequests} = requestSlice.actions
 
 export default requestSlice.reducer

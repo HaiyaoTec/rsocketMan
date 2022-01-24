@@ -1,0 +1,15 @@
+.datasheet .ant-collapse-header{
+    justify-content: space-between!important;
+    background-color: #1f2128;
+    color: #FFFFFFE0!important;
+}
+
+.datasheet .ant-collapse-content-box{
+    padding: 0!important;
+}
+.datasheet .ant-collapse-borderless{
+    background-color: #252730;
+}
+.datasheet .site-collapse-custom-panel{
+    background-color: #1f2128;
+}
