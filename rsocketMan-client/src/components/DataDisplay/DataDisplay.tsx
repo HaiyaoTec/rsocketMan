@@ -33,9 +33,9 @@ const formItemLayout = {
   },
 };
 // window.location.reload();
-const sideBarRef=document.querySelector("#sideBar")
 
 const DataDisplay: FC = () => {
+  const sideBarRef=document.querySelector("#sideBar")
   console.log("render");
   const params = useParams();
   const navigate = useNavigate()
