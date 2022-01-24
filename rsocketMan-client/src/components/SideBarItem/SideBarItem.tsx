@@ -15,8 +15,10 @@ import './css/index.css'
 type prosType = {
   info: RequestSliceItem
   path:string
+  sideBarRef:React.MutableRefObject<null>
 }
-const SideBarItem: FC<prosType> = ({info,path}) => {
+
+const SideBarItem: FC<prosType> = ({info,path,sideBarRef}) => {
 console.log(path)
   const dispatch = useDispatch()
   const [current,setCurrent]=useState('')
@@ -97,6 +99,8 @@ console.log(path)
             e.preventDefault()
             e.stopPropagation()
             const nanoID = nanoid()
+            // @ts-ignore
+            sideBarRef.current.scrollTop=0;
             store.dispatch(addRequestItem({...info, id: nanoID, receive: [],isFirstSend:true}))
             navigate(nanoID)
           }}>COPY</span>

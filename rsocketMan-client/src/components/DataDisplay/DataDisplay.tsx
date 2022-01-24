@@ -33,6 +33,7 @@ const formItemLayout = {
   },
 };
 // window.location.reload();
+const sideBarRef=document.querySelector("#sideBar")
 
 const DataDisplay: FC = () => {
   console.log("render");
@@ -93,6 +94,8 @@ const DataDisplay: FC = () => {
       sendMessageByMethod({...value, id:`${newId}`});
       //跳转路由
       navigate(`/${newId}`)
+      // @ts-ignore
+      sideBarRef.scrollTop=0
     } else {
       store.dispatch(updateRequestItem({...value, id,isFirstSend:false}));
       sendMessageByMethod({...value, id});

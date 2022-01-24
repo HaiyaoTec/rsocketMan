@@ -4,7 +4,7 @@ import {store} from "../../store/store";
 import {addRequestItem, clearRequests, RequestSliceItem} from "../../store/slice/RequestSlice";
 import {nanoid} from "nanoid";
 import SideBarItem from "../SideBarItem/SideBarItem";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Sider from "antd/es/layout/Sider";
 import './css/index.css'
 import {CSSTransition, TransitionGroup,} from 'react-transition-group';
@@ -15,13 +15,17 @@ type props = {
   requestItems: RequestSliceItem[]
 }
 const SideList = ({requestItems}: props) => {
-  let { pathname } = useLocation();
+  let {pathname} = useLocation();
   let navigate = useNavigate()
-  pathname=pathname.slice(1)
+  pathname = pathname.slice(1)
+  const sideRef=useRef(null)
   console.log(pathname)
-  const [current,setCurrent]=useState('')
+
+  const [current, setCurrent] = useState('')
   return (
     <Sider
+      id={"sideBar"}
+      ref={sideRef}
       css={
         css`
           border: 1px solid #000000;
@@ -38,23 +42,27 @@ const SideList = ({requestItems}: props) => {
       }
     >
       <div css={css`
-      display: flex;
-      justify-content: center;
+        display: flex;
+        justify-content: center;
         position: sticky;
         top: 0;
         height: 44px;
-        margin: 20px 20px 20px 20px;
+        padding: 20px 20px 30px 20px;
+        margin-bottom: 40px;
+        background-color:#252730;
       `
       }
            onClick={() => {
              const nanoID = nanoid()
+             // @ts-ignore
+             sideRef.current.scrollTop=0;
              store.dispatch(addRequestItem({
                id: nanoID,
                metadata: '',
                route: '',
                data: '',
                receive: [],
-               isFirstSend:true,
+               isFirstSend: true,
                method: 'requestStream'
              }))
              navigate(nanoID)
@@ -78,18 +86,19 @@ const SideList = ({requestItems}: props) => {
         </div>
 
         <div
-        css={css`
-          margin-left: 10px;
-          cursor: pointer;
-          &:hover{
-          transition: .3s all ease;
-          transform: scale(1.2);
-          }
-        `}
-        onClick={(e)=>{
-          e.stopPropagation()
-          store.dispatch(clearRequests())
-        }}
+          css={css`
+            margin-left: 10px;
+            cursor: pointer;
+
+            &:hover {
+              transition: .3s all ease;
+              transform: scale(1.2);
+            }
+          `}
+          onClick={(e) => {
+            e.stopPropagation()
+            store.dispatch(clearRequests())
+          }}
         >
           <img src={trash}/>
         </div>
@@ -106,7 +115,7 @@ const SideList = ({requestItems}: props) => {
             >
               <div
                 key={item.id}>
-              <SideBarItem path={pathname} info={item}/>
+                <SideBarItem sideBarRef={sideRef} path={pathname} info={item}/>
               </div>
             </CSSTransition>
           ))
