@@ -11,11 +11,9 @@ A devtool for rsocket protocol 🔧
 
 Easy to help you to test your rsocket servers 🎸
 
-![](./assets/pic1.jpg)
+![](./assets/config.jpg)
 
-![](./assets/pic2.jpg)
-
-![](./assets/exmple.gif)
+![](./assets/content.jpg)
 
 # Development Environment 🎨
 
