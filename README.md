@@ -19,8 +19,6 @@ Easy to help you to test your rsocket servers 🎸
 
 ![RsocketManShow](https://cdn.jsdelivr.net/gh/sudongyuer/image-bed@master/20220305/RsocketManShow.gif)
 
-![](./assets/config.jpg)
-
 ![](./assets/content.jpg)
 
 # Development Environment 🎨
