@@ -1,5 +1,5 @@
 
-# rsocketMan 🐳
+# RsocketMan 🐳
 
 <p align="center">
 <a href="https://github.com/HaiyaoTec/rsocketMan" target="_blank">
@@ -7,9 +7,17 @@
 </a>
 </p>
 
+<p align="center">
+<a href="https://github.com/HaiyaoTec/rsocketMan" target="__blank"><img alt="GitHub stars" src="https://img.shields.io/github/stars/HaiyaoTec/rsocketMan?style=social"></a>
+</p>
+
 A devtool for rsocket protocol 🔧
 
 Easy to help you to test your rsocket servers 🎸
+
+## How it works?
+
+![RsocketManShow](https://cdn.jsdelivr.net/gh/sudongyuer/image-bed@master/20220305/RsocketManShow.gif)
 
 ![](./assets/config.jpg)
 
