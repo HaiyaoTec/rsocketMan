@@ -1,5 +1,5 @@
 
-# RsocketMan 🐳
+# rsocketMan 🐳
 
 <p align="center">
 <a href="https://github.com/HaiyaoTec/rsocketMan" target="_blank">
